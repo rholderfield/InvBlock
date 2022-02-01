@@ -52,17 +52,3 @@ export default {
   }
 }
 </script>
-
-<style>
-
-.text-center { text-align: center; }
-.text-moralis-green { color: #b7e803; }
-.text-moralis-gray { color: #041836; }
-.mt-4 { margin-top: 20px }
-.mt-1 { margin-top: 4px }
-.mt-10 { margin-top: 40px }
-.text-xl { font-size: 28px; }
-.text-base { font-size: 16px; }
-.font-semibold { font-weight: 600; }
-
-</style>
