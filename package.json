@@ -12,6 +12,7 @@
   "main": "src/main.js",
   "dependencies": {
     "@walletconnect/web3-provider": "^1.6.5",
+    "ant-design-vue": "^2.2.8",
     "core-js": "^3.6.5",
     "moralis": "0.0.90",
     "vue": "^3.0.0",

@@ -1,18 +1,10 @@
 <template>
-  <div class="text-moralis-gray">
-    <div class="mt-4">
-      <div class="text-xl font-semibold">Moralis starter boilerplate</div>
-      <div class="text-sm mt-1 text-moralis-green font-semibold">Powered by Vue.js</div>
-    </div>
-    <div class="mt-10">
       <template v-if="isAuthenticated">
-        {{getEllipsisTxt(user.get('ethAddress'), 5)}} <button @click="logout">Logout</button>
+        {{getEllipsisTxt(user.get('ethAddress'), 5)}} <a-button type="primary" @click="logout">Logout</a-button>
       </template>
       <template v-else>
-        <button @click="login">Connect wallet</button>
+        <a-button type="primary" @click="login">Connect wallet</a-button>
       </template> 
-    </div>
-  </div>
 </template>
 
 <script>
@@ -22,7 +14,7 @@ import { getEllipsisTxt } from '../helpers/formatters.js'
 
 
 export default {
-  name: 'Title',
+  name: 'ConnectButton',
   setup() {
     const store = useStore()
     const $moralis = inject('$moralis')
