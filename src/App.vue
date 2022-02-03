@@ -5,6 +5,10 @@
       :style="{ height: 'auto', background: 'none', padding: '0px' }"
     >
       <div id="nav">
+        <div :style="{ float: 'left', paddingLeft: '8px', backgroundColor: '#FFFFFF' }">
+        <img alt="logo" width="32" src="./assets/pixlogo.png">
+        <a-divider type="vertical" />
+        </div>
         <a-menu
           v-model:selectedKeys="current"
           mode="horizontal"
@@ -35,7 +39,7 @@
               ><user-outlined /> Suppliers</router-link
             ></a-menu-item
           >
-          <li :style="{ marginLeft: 'auto', order: '6', paddingRight: '6px' }">
+          <li :style="{ marginLeft: 'auto', order: '6', paddingRight: '8px' }">
             <ConnectButton />
           </li>
         </a-menu>
@@ -54,8 +58,32 @@
       >
         <router-view />
       </a-layout-content>
-      <a-layout-sider :style="{ backgroundColor: '#1890ff' }">
-        Sider
+      <a-layout-sider
+        collapsible
+        :reverseArrow="true"
+        theme="light"
+        :style="{ border: 'box' }"
+      >
+        <div class="logo" />
+        <br />
+        <a-menu mode="inline">
+          <a-menu-item key="1">
+            <container-outlined />
+            <span>Add Sales Order</span>
+          </a-menu-item>
+          <a-menu-item key="2">
+            <wallet-outlined />
+            <span>Add Purchase Order</span>
+          </a-menu-item>
+          <a-menu-item key="3">
+            <tag-outlined />
+            <span>Add Products</span>
+          </a-menu-item>
+          <a-menu-item key="4">
+            <user-outlined />
+            <span>Add Suppliers</span>
+          </a-menu-item>
+        </a-menu>
       </a-layout-sider>
     </a-layout>
     <!-- body -->
@@ -65,6 +93,7 @@
 <script>
 // @ is an alias to /src
 import ConnectButton from "@/components/ConnectButton.vue";
+
 import {
   HomeOutlined,
   UserOutlined,
@@ -86,7 +115,7 @@ export default {
   },
   setup() {
     const current = ref(["1"]);
-    const collapsed = ref(false);
+    const collapsed = ref(true);
     return {
       current,
       collapsed,
