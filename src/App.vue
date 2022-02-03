@@ -67,22 +67,31 @@
         <div class="logo" />
         <br />
         <a-menu mode="inline">
+          <a-menu-item-group key="sales">
+          <template #title>Sales</template>
           <a-menu-item key="1">
             <container-outlined />
             <span>Add Sales Order</span>
           </a-menu-item>
+          </a-menu-item-group>
+          <a-menu-item-group key="purchasing">
+           <template #title>Purchasing</template> 
           <a-menu-item key="2">
             <wallet-outlined />
             <span>Add Purchase Order</span>
           </a-menu-item>
           <a-menu-item key="3">
-            <tag-outlined />
-            <span>Add Products</span>
-          </a-menu-item>
-          <a-menu-item key="4">
             <user-outlined />
-            <span>Add Suppliers</span>
+            <span>Add Supplier</span>
           </a-menu-item>
+          </a-menu-item-group>
+          <a-menu-item-group key="products">
+           <template #title>Products</template> 
+          <a-menu-item key="4">
+            <tag-outlined />
+            <span>Add Product</span>
+          </a-menu-item>
+          </a-menu-item-group>
         </a-menu>
       </a-layout-sider>
     </a-layout>
