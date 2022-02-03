@@ -1,5 +1,104 @@
 <template>
-  <div class="suppliers">
-    <h1>This is the Supplier lister</h1>
-  </div>
+<br />
+<div :style="{
+          background: '#fff',
+          padding: '0 96px',
+
+        }">
+  <a-table sticky :columns="columns" :data-source="data" :scroll="{ x: 1500 }">
+    <template #bodyCell="{ column }">
+      <template v-if="column.key === 'operation'"><a>action</a></template>
+    </template>
+    <template #summary>
+      <a-table-summary>
+        <a-table-summary-row>
+          <a-table-summary-cell :index="0" :col-span="2">Fix Left</a-table-summary-cell>
+          <a-table-summary-cell :index="2" :col-span="8">Scroll Context</a-table-summary-cell>
+          <a-table-summary-cell :index="10">Fix Right</a-table-summary-cell>
+        </a-table-summary-row>
+      </a-table-summary>
+    </template>
+  </a-table>
+</div>
 </template>
+<script>
+import { ref } from 'vue';
+export default ({
+  name: "Suppliers",
+  setup() {
+    const columns = ref([{
+      title: 'Full Name',
+      width: 100,
+      dataIndex: 'name',
+      key: 'name',
+      fixed: 'left',
+    }, {
+      title: 'Age',
+      width: 100,
+      dataIndex: 'age',
+      key: 'age',
+      fixed: 'left',
+    }, {
+      title: 'Column 1',
+      dataIndex: 'address',
+      key: '1',
+      width: 150,
+    }, {
+      title: 'Column 2',
+      dataIndex: 'address',
+      key: '2',
+      width: 150,
+    }, {
+      title: 'Column 3',
+      dataIndex: 'address',
+      key: '3',
+      width: 150,
+    }, {
+      title: 'Column 4',
+      dataIndex: 'address',
+      key: '4',
+      width: 150,
+    }, {
+      title: 'Column 5',
+      dataIndex: 'address',
+      key: '5',
+      width: 150,
+    }, {
+      title: 'Column 6',
+      dataIndex: 'address',
+      key: '6',
+      width: 150,
+    }, {
+      title: 'Column 7',
+      dataIndex: 'address',
+      key: '7',
+      width: 150,
+    }, {
+      title: 'Column 8',
+      dataIndex: 'address',
+      key: '8',
+    }, {
+      title: 'Action',
+      key: 'operation',
+      fixed: 'right',
+      width: 100,
+    }]);
+    const data = [];
+
+    for (let i = 0; i < 100; i++) {
+      data.push({
+        key: i,
+        name: `Org ${i}`,
+        age: 32,
+        address: `London Park no. ${i}`,
+      });
+    }
+
+    return {
+      data,
+      columns,
+    };
+  },
+
+});
+</script>
