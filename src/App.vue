@@ -5,9 +5,15 @@
       :style="{ height: 'auto', background: 'none', padding: '0px' }"
     >
       <div id="nav">
-        <div :style="{ float: 'left', paddingLeft: '8px', backgroundColor: '#FFFFFF' }">
-        <img alt="logo" width="32" src="./assets/pixlogo.png">
-        <a-divider type="vertical" />
+        <div
+          :style="{
+            float: 'left',
+            paddingLeft: '8px',
+            backgroundColor: '#FFFFFF',
+          }"
+        >
+          <img alt="logo" width="32" src="./assets/pixlogo.png" />
+          <a-divider type="vertical" />
         </div>
         <a-menu
           v-model:selectedKeys="current"
@@ -68,29 +74,36 @@
         <br />
         <a-menu mode="inline">
           <a-menu-item-group key="sales">
-          <template #title>Sales</template>
-          <a-menu-item key="1">
-            <container-outlined />
-            <span>Add Sales Order</span>
-          </a-menu-item>
+            <template #title>Sales</template>
+            <a-menu-item key="1">
+              <router-link to="/addsalesorder">
+              <container-outlined />
+              <span> Add Sales Order</span></router-link>
+            </a-menu-item>
           </a-menu-item-group>
           <a-menu-item-group key="purchasing">
-           <template #title>Purchasing</template> 
-          <a-menu-item key="2">
-            <wallet-outlined />
-            <span>Add Purchase Order</span>
-          </a-menu-item>
-          <a-menu-item key="3">
-            <user-outlined />
-            <span>Add Supplier</span>
-          </a-menu-item>
+            <template #title>Purchasing</template>
+            <a-menu-item key="2">
+              <router-link to="/addpurchaseorder">
+              <wallet-outlined />
+              <span> Add Purchase Order</span>
+              </router-link>
+            </a-menu-item>
+            <a-menu-item key="3">
+              <router-link to="/addsupplier">
+              <user-outlined />
+              <span>Add Supplier</span>
+              </router-link>
+            </a-menu-item>
           </a-menu-item-group>
           <a-menu-item-group key="products">
-           <template #title>Products</template> 
-          <a-menu-item key="4">
-            <tag-outlined />
-            <span>Add Product</span>
-          </a-menu-item>
+            <template #title>Products</template>
+            <a-menu-item key="4">
+              <router-link to="/addproduct">
+              <tag-outlined />
+              <span>Add Product</span>
+              </router-link>
+            </a-menu-item>
           </a-menu-item-group>
         </a-menu>
       </a-layout-sider>
@@ -124,10 +137,8 @@ export default {
   },
   setup() {
     const current = ref(["1"]);
-    const collapsed = ref(true);
     return {
       current,
-      collapsed,
     };
   },
 };

@@ -38,6 +38,38 @@ const routes = [
     // this generates a separate chunk (about.[hash].js) for this route
     // which is lazy-loaded when the route is visited.
     component: () => import(/* webpackChunkName: "about" */ '../views/Suppliers.vue')
+  },
+  {
+    path: '/addsalesorder',
+    name: 'AddSalesOrder',
+    // route level code-splitting
+    // this generates a separate chunk (about.[hash].js) for this route
+    // which is lazy-loaded when the route is visited.
+    component: () => import(/* webpackChunkName: "about" */ '../views/SalesOrderAdd.vue')
+  },
+  {
+    path: '/addpurchaseorder',
+    name: 'AddPurchaseOrder',
+    // route level code-splitting
+    // this generates a separate chunk (about.[hash].js) for this route
+    // which is lazy-loaded when the route is visited.
+    component: () => import(/* webpackChunkName: "about" */ '../views/PurchaseOrderAdd.vue')
+  },
+  {
+    path: '/addsupplier',
+    name: 'AddSupplier',
+    // route level code-splitting
+    // this generates a separate chunk (about.[hash].js) for this route
+    // which is lazy-loaded when the route is visited.
+    component: () => import(/* webpackChunkName: "about" */ '../views/SuppliersAdd.vue')
+  },
+  {
+    path: '/addproduct',
+    name: 'AddProduct',
+    // route level code-splitting
+    // this generates a separate chunk (about.[hash].js) for this route
+    // which is lazy-loaded when the route is visited.
+    component: () => import(/* webpackChunkName: "about" */ '../views/ProductsAdd.vue')
   }
 ]
 
