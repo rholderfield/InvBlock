@@ -2,7 +2,7 @@
   <div
     :style="{
       background: '#fff',
-      padding: '0 48px',
+      padding: '8px 48px',
     }"
   >
     <a-card style="width: 600px" title="Product Details">
@@ -41,20 +41,20 @@
           <a-textarea v-model:value="formState.user.introduction" />
         </a-form-item>
       </a-form>
-    </a-card>
-    <a-card actions style="width: 600px">
-      <a-button :style="{ float: 'right' }" type="primary" html-type="submit"
-        >Submit</a-button
-      >
-      <a-button :style="{ float: 'right' }" @click="$router.go(-1)"
-        >Go Back</a-button
-      >
+      <a-card actions>
+        <a-button :style="{ float: 'right' }" type="primary" html-type="submit" @click="print"
+          >Submit</a-button
+        >
+        <a-button :style="{ float: 'right' }" @click="$router.go(-1)"
+          >Go Back</a-button
+        >
+      </a-card>
     </a-card>
   </div>
 </template>
 <style scoped>
 button.ant-btn {
-  margin: 8px;
+  margin: 0 8px;
 }
 
 form.ant-form.ant-form-horizontal {
@@ -98,11 +98,16 @@ export default {
       console.log("Success:", values);
     };
 
+    const print = () => {
+      console.log(formState);
+    }
+
     return {
       formState,
       onFinish,
       layout,
       validateMessages,
+      print
     };
   },
 };
