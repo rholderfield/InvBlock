@@ -1,5 +1,5 @@
 <template>
-<br />
+
 <div :style="{
           background: '#fff',
           padding: '0 96px',

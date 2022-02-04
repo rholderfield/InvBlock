@@ -1,5 +1,4 @@
 <template>
-  <br />
   <a-card style="width: 600px" title="Supplier Details">
     <a-form
       :model="formState"

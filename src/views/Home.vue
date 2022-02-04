@@ -1,5 +1,4 @@
 <template>
-  <br />
   <div
     :style="{
       background: '#fff',

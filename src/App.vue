@@ -92,7 +92,7 @@
             <a-menu-item key="3">
               <router-link to="/addsupplier">
               <user-outlined />
-              <span>Add Supplier</span>
+              <span> Add Supplier</span>
               </router-link>
             </a-menu-item>
           </a-menu-item-group>
@@ -101,7 +101,7 @@
             <a-menu-item key="4">
               <router-link to="/addproduct">
               <tag-outlined />
-              <span>Add Product</span>
+              <span> Add Product</span>
               </router-link>
             </a-menu-item>
           </a-menu-item-group>
