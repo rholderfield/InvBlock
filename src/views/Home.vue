@@ -2,7 +2,7 @@
   <div
     :style="{
       background: '#fff',
-      padding: '8px 48px',
+      padding: '8px 8px',
     }"
   >
     <a-calendar v-model:value="value" />

@@ -1,7 +1,7 @@
 <template>
 <div :style="{
           background: '#fff',
-          padding: '8px 48px',
+          padding: '8px 8px',
 
         }">
   <a-table sticky :columns="columns" :data-source="data" :scroll="{ x: 1500 }">

@@ -14,38 +14,18 @@
         >
           <img alt="logo" width="32" src="./assets/pixlogo.png" />
           <a-divider type="vertical" />
+          <router-link to="/"> Home</router-link>
+          <a-divider type="vertical" />
         </div>
         <a-menu
           v-model:selectedKeys="current"
           mode="horizontal"
           :style="{ lineHeight: '64px' }"
         >
-          <a-menu-item key="1"
-            ><router-link to="/"
-              ><home-outlined /> | Home</router-link
-            ></a-menu-item
+          <li
+            key="1"
+            :style="{ marginLeft: 'auto', order: '6', paddingRight: '8px' }"
           >
-          <a-menu-item key="2"
-            ><router-link to="/salesorder"
-              ><container-outlined /> Sales Order</router-link
-            ></a-menu-item
-          >
-          <a-menu-item key="3"
-            ><router-link to="/purchaseorder"
-              ><wallet-outlined /> Purchase Order</router-link
-            ></a-menu-item
-          >
-          <a-menu-item key="4"
-            ><router-link to="/products"
-              ><tag-outlined /> Products</router-link
-            ></a-menu-item
-          >
-          <a-menu-item key="5"
-            ><router-link to="/suppliers"
-              ><user-outlined /> Suppliers</router-link
-            ></a-menu-item
-          >
-          <li :style="{ marginLeft: 'auto', order: '6', paddingRight: '8px' }">
             <ConnectButton />
           </li>
         </a-menu>
@@ -55,58 +35,67 @@
 
     <!-- body -->
     <a-layout>
-      <a-layout-content
-        :style="{
-          background: '#fff',
-          padding: '0 24px',
-          minHeight: 'calc(100vh - 70px)',
-        }"
-      >
-        <router-view />
-      </a-layout-content>
-      <a-layout-sider
-        collapsible
-        :reverseArrow="true"
-        theme="light"
-        :style="{ border: 'box' }"
-      >
+      <a-layout-sider collapsible theme="light" :style="{ border: 'box' }">
         <div class="logo" />
         <br />
         <a-menu mode="inline">
           <a-menu-item-group key="sales">
-            <template #title>Sales</template>
+            <template #title
+              ><router-link to="/salesorder">Sales</router-link></template
+            >
             <a-menu-item key="1">
               <router-link to="/addsalesorder">
-              <container-outlined />
-              <span> Add Sales Order</span></router-link>
+                <container-outlined />
+                <span> Add Sales Order</span></router-link
+              >
             </a-menu-item>
           </a-menu-item-group>
           <a-menu-item-group key="purchasing">
-            <template #title>Purchasing</template>
+            <template #title
+              ><router-link to="/purchaseorder"
+                >Purchasing</router-link
+              ></template
+            >
             <a-menu-item key="2">
               <router-link to="/addpurchaseorder">
-              <wallet-outlined />
-              <span> Add Purchase Order</span>
+                <wallet-outlined />
+                <span> Add Purchase Order</span>
               </router-link>
             </a-menu-item>
+          </a-menu-item-group>
+          <a-menu-item-group key="suppliers">
+            <template #title
+              ><router-link to="/suppliers">Suppliers</router-link></template
+            >
             <a-menu-item key="3">
               <router-link to="/addsupplier">
-              <user-outlined />
-              <span> Add Supplier</span>
+                <user-outlined />
+                <span> Add Supplier</span>
               </router-link>
             </a-menu-item>
           </a-menu-item-group>
           <a-menu-item-group key="products">
-            <template #title>Products</template>
+            <template #title
+              ><router-link to="/products">Products</router-link></template
+            >
             <a-menu-item key="4">
               <router-link to="/addproduct">
-              <tag-outlined />
-              <span> Add Product</span>
+                <tag-outlined />
+                <span> Add Product</span>
               </router-link>
             </a-menu-item>
           </a-menu-item-group>
         </a-menu>
       </a-layout-sider>
+      <a-layout-content
+        :style="{
+          background: '#fff',
+          padding: '0 24px',
+          minHeight: 'calc(90vh - 70px)',
+        }"
+      >
+        <router-view />
+      </a-layout-content>
     </a-layout>
     <!-- body -->
   </a-layout>
@@ -117,7 +106,6 @@
 import ConnectButton from "@/components/ConnectButton.vue";
 
 import {
-  HomeOutlined,
   UserOutlined,
   WalletOutlined,
   TagOutlined,
@@ -129,7 +117,6 @@ export default {
   name: "App",
   components: {
     ConnectButton,
-    HomeOutlined,
     UserOutlined,
     WalletOutlined,
     TagOutlined,

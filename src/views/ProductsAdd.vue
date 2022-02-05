@@ -2,7 +2,7 @@
   <div
     :style="{
       background: '#fff',
-      padding: '8px 48px',
+      padding: '8px 8px',
     }"
   >
     <a-card style="width: 600px" title="Product Details">

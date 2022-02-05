@@ -61,5 +61,8 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/laurynas1337/vue3-moralis-starter.git"
+  },
+  "theme": {
+    "primary-color": "red"
   }
 }
