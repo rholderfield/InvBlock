@@ -14,7 +14,7 @@
         >
           <img alt="logo" width="32" src="./assets/pixlogo.png" />
           <a-divider type="vertical" />
-          <router-link to="/"> Home</router-link>
+          <router-link to="/">Home</router-link>
           <a-divider type="vertical" />
         </div>
         <a-menu
