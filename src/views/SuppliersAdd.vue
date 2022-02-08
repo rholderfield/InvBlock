@@ -5,14 +5,14 @@
       padding: '8px 8px',
     }"
   >
-    <a-card :style="{width: '600px', backgroundColor: '#fafafa'}" title="Supplier Details">
+    <a-card :style="{width: '600px'}" :headStyle="{backgroundColor: '#fafafa'}" title="Supplier Details">
       <a-form
         :model="formState"
         v-bind="layout"
         name="nest-messages"
         :validate-messages="validateMessages"
         @finish="onFinish"
-      >
+      > 
         <a-form-item
           :name="['user', 'name']"
           label="Name"

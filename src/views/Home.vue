@@ -4,38 +4,33 @@
       background: '#fff',
       padding: '8px 8px',
       display: 'flex',
-      gap: '8px'
+      gap: '8px',
     }"
   >
     <div
       :style="{
         width: '300px',
-        border: '1px solid #d9d9d9',
+        border: '1px solid #f0f0f0',
         borderRadius: '1px',
-        padding: '8px'
       }"
     >
-      <a-card>
-        <a-statistic
-          title="Total Products"
-          :value="112893"
-        />
-        <br />
-        <a-statistic
-          title="Total Suppliers"
-          :value="112893"
-        />
-      </a-card>
+      <a-calendar :fullscreen="false"/>
     </div>
 
     <div
       :style="{
         width: '300px',
-        border: '1px solid #d9d9d9',
+        border: '1px solid',
         borderRadius: '1px',
+        padding: '8px',
+        display: 'contents',
       }"
     >
-      <a-calendar :fullscreen="false" @panelChange="onPanelChange" />
+      <a-card>
+        <a-statistic title="Total Products" :value="112893" />
+        <br />
+        <a-statistic title="Total Suppliers" :value="112893" />
+      </a-card>
     </div>
   </div>
 </template>

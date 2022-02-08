@@ -5,7 +5,7 @@
       padding: '8px 8px',
     }"
   >
-    <a-card :style="{width: '600px', backgroundColor: '#fafafa'}" title="Product Details">
+    <a-card :style="{width: '600px'}" :headStyle="{backgroundColor: '#fafafa'}" title="Product Details">
       <a-form
         :model="formState"
         v-bind="layout"
