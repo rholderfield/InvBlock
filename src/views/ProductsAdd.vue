@@ -5,7 +5,7 @@
       padding: '8px 8px',
     }"
   >
-    <a-card style="width: 600px" title="Product Details">
+    <a-card :style="{width: '600px', backgroundColor: '#fafafa'}" title="Product Details">
       <a-form
         :model="formState"
         v-bind="layout"
@@ -41,7 +41,7 @@
           <a-textarea v-model:value="formState.user.introduction" />
         </a-form-item>
       </a-form>
-      <a-card actions>
+      <a-card actions :style="{ backgroundColor: '#fafafa'}">
         <a-button :style="{ float: 'right' }" type="primary" html-type="submit" @click="print"
           >Submit</a-button
         >

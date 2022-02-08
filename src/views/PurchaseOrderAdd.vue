@@ -5,10 +5,10 @@
       padding: '8px 8px',
     }"
   >
-    <a-card title="Purchase Order Details">
+    <a-card title="Purchase Order Details" :style="{ backgroundColor: '#fafafa'}">
       <a-card> Order Details </a-card>
       <a-card :style="{ marginTop: '16px' }"> Line Details </a-card>
-      <a-card actions :style="{ marginTop: '16px' }">
+      <a-card actions :style="{ marginTop: '16px', backgroundColor: '#fafafa' }">
         <a-button
           :style="{ float: 'right' }"
           type="primary"
