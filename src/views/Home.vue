@@ -3,9 +3,40 @@
     :style="{
       background: '#fff',
       padding: '8px 8px',
+      display: 'flex',
+      gap: '8px'
     }"
   >
-    <a-calendar v-model:value="value" />
+    <div
+      :style="{
+        width: '300px',
+        border: '1px solid #d9d9d9',
+        borderRadius: '4px',
+        padding: '8px'
+      }"
+    >
+      <a-card>
+        <a-statistic
+          title="Total Products"
+          :value="112893"
+        />
+        <br />
+        <a-statistic
+          title="Total Suppliers"
+          :value="112893"
+        />
+      </a-card>
+    </div>
+
+    <div
+      :style="{
+        width: '300px',
+        border: '1px solid #d9d9d9',
+        borderRadius: '4px',
+      }"
+    >
+      <a-calendar :fullscreen="false" @panelChange="onPanelChange" />
+    </div>
   </div>
 </template>
 
