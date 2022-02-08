@@ -11,7 +11,7 @@
       :style="{
         width: '300px',
         border: '1px solid #d9d9d9',
-        borderRadius: '4px',
+        borderRadius: '1px',
         padding: '8px'
       }"
     >
@@ -32,7 +32,7 @@
       :style="{
         width: '300px',
         border: '1px solid #d9d9d9',
-        borderRadius: '4px',
+        borderRadius: '1px',
       }"
     >
       <a-calendar :fullscreen="false" @panelChange="onPanelChange" />
