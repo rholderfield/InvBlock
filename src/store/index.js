@@ -3,12 +3,16 @@ import { createStore } from 'vuex'
 const store = createStore({
   state () {
     return {
-      user: {}
+      user: {},
+      hasMetaMask: false
     }
   },
   mutations: {
     setUser (state, payload) {
       state.user = payload
+    },
+    setHasMetaMask(state) {
+      state.hasMetaMask = true
     }
   }
 })
