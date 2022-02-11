@@ -32,8 +32,8 @@ jobs:
           output_location: "dist" # Built app content directory - optional
           ###### End of Repository/Build Configurations ######
         env:
-          VUE_APP_MORALIS_APP_ID: ${{ secrets.VUE_APP_MORALIS_APP_ID }}
-          VUE_APP_MORALIS_SERVER_URL: ${{ secrets.VUE_APP_MORALIS_SERVER_URL }}
+          VUE_APP_MORALIS_APP_ID: ${{ VUE_APP_MORALIS_APP_ID }}
+          VUE_APP_MORALIS_SERVER_URL: ${{ VUE_APP_MORALIS_SERVER_URL }}
 
   close_pull_request_job:
     if: github.event_name == 'pull_request' && github.event.action == 'closed'
