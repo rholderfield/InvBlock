@@ -34,7 +34,7 @@
     <!-- header -->
 
     <!-- body -->
-    <a-layout>
+    <a-layout class="ant-layout-has-sider">
       <a-layout-sider collapsible theme="light" :style="{ border: 'box' }">
         <div class="logo" />
         <br />
@@ -143,4 +143,6 @@ export default {
 #nav a {
   font-weight: bold;
 }
+
+
 </style>
