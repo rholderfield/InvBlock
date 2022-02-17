@@ -14,7 +14,7 @@
           type="primary"
           html-type="submit"
           @click="print"
-          >Submit</a-button
+          >Save</a-button
         >
         <a-button :style="{ float: 'right' }" @click="$router.go(-1)"
           >Go Back</a-button
@@ -27,6 +27,8 @@
 <style scoped>
 button.ant-btn {
   margin: 0 8px;
+  color: #05182A;
+
 }
 
 form.ant-form.ant-form-horizontal {

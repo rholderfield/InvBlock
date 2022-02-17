@@ -142,7 +142,23 @@ export default {
 
 #nav a {
   font-weight: bold;
+  color: #05182A;
 }
 
+button.ant-btn {
+  color: #05182A;
+}
 
+button.ant-btn:hover,
+button.ant-btn:focus,
+button.ant-btn:active {
+  color: #05182A;
+}
+
+.ant-menu-item-group-title a{
+    font-weight: 500;
+
+    color: #05182A;
+
+}
 </style>
