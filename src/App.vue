@@ -131,7 +131,6 @@ export default {
 };
 </script>
 
-
 <style>
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
@@ -141,24 +140,22 @@ export default {
 }
 
 #nav a {
-  font-weight: bold;
-  color: #05182A;
+  color: #05182a;
 }
 
 button.ant-btn {
-  color: #05182A;
+  color: #05182a;
 }
 
 button.ant-btn:hover,
 button.ant-btn:focus,
 button.ant-btn:active {
-  color: #05182A;
+  color: #05182a;
 }
 
-.ant-menu-item-group-title a{
-    font-weight: 500;
+.ant-menu-item-group-title a {
+  font-weight: 500;
 
-    color: #05182A;
-
+  color: #05182a;
 }
 </style>

@@ -5,7 +5,11 @@
       padding: '8px 8px',
     }"
   >
-    <a-card :style="{width: '600px'}" :headStyle="{backgroundColor: '#fafafa'}" title="Product Details">
+    <a-card
+      :style="{ width: '600px' }"
+      :headStyle="{ backgroundColor: '#fafafa' }"
+      title="Product Details"
+    >
       <a-form
         :model="formState"
         v-bind="layout"
@@ -41,10 +45,16 @@
           <a-textarea v-model:value="formState.user.introduction" />
         </a-form-item>
       </a-form>
-      <a-card actions :style="{ backgroundColor: '#fafafa'}">
-        <a-button :style="{ float: 'right' }" type="primary" html-type="submit" @click="print"
-          >Save</a-button
-        >
+      <a-card actions :style="{ backgroundColor: '#fafafa' }">
+        <template v-if="isAuthenticated">
+          <a-button
+            :style="{ float: 'right' }"
+            type="primary"
+            html-type="submit"
+            @click="print"
+            >Save</a-button
+          >
+        </template>
         <a-button :style="{ float: 'right' }" @click="$router.go(-1)"
           >Go Back</a-button
         >
@@ -55,7 +65,7 @@
 <style scoped>
 button.ant-btn {
   margin: 0 8px;
-  color: #05182A;
+  color: #05182a;
 }
 
 form.ant-form.ant-form-horizontal {
@@ -63,10 +73,16 @@ form.ant-form.ant-form-horizontal {
 }
 </style>
 <script>
-import { reactive } from "vue";
+import { inject, reactive, computed } from "vue";
+import { useStore } from "vuex";
+
 export default {
   name: "ProductsAdd",
   setup() {
+    const store = useStore();
+    const contractInvBlock = inject("contractInvBlock");
+    const contract = contractInvBlock.ProductFactory;
+
     const layout = {
       labelCol: {
         span: 8,
@@ -100,15 +116,16 @@ export default {
     };
 
     const print = () => {
-      console.log(formState);
-    }
+      console.log(formState, contract);
+    };
 
     return {
       formState,
       onFinish,
       layout,
       validateMessages,
-      print
+      print,
+      isAuthenticated: computed(() => Object.keys(store.state.user).length > 0),
     };
   },
 };
