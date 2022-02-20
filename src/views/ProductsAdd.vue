@@ -14,35 +14,42 @@
         :model="formState"
         v-bind="layout"
         name="nest-messages"
-        :validate-messages="validateMessages"
         @finish="onFinish"
       >
         <a-form-item
-          :name="['user', 'name']"
-          label="Name"
-          :rules="[{ required: true }]"
+          :name="['product', 'ProductId']"
+          :label="['Product Id']"
+          :rules="[
+            { required: true, type: 'number', min: 0, max: 100000000000 },
+          ]"
         >
-          <a-input v-model:value="formState.user.name" />
+          <a-input-number v-model:value="formState.product.ProductId" />
         </a-form-item>
         <a-form-item
-          :name="['user', 'email']"
-          label="Email"
-          :rules="[{ type: 'email' }]"
+          :name="['product', 'ProductName']"
+          label="Product Name"
+          :rules="[
+            { type: 'string', min: 0, max: 300, message: 'Exceeds length' },
+          ]"
         >
-          <a-input v-model:value="formState.user.email" />
+          <a-input v-model:value="formState.product.ProductName" />
         </a-form-item>
         <a-form-item
-          :name="['user', 'age']"
-          label="Age"
-          :rules="[{ type: 'number', min: 0, max: 99 }]"
+          :name="['product', 'PartNumber']"
+          label="Product Number"
+          :rules="[
+            { type: 'string', min: 0, max: 300, message: 'Exceeds length' },
+          ]"
         >
-          <a-input-number v-model:value="formState.user.age" />
+          <a-input v-model:value="formState.product.PartNumber" />
         </a-form-item>
-        <a-form-item :name="['user', 'website']" label="Website">
-          <a-input v-model:value="formState.user.website" />
-        </a-form-item>
-        <a-form-item :name="['user', 'introduction']" label="Introduction">
-          <a-textarea v-model:value="formState.user.introduction" />
+        <a-form-item
+          label="Product Description"
+          :rules="[
+            { type: 'string', min: 0, max: 2000, message: 'Exceeds length' },
+          ]"
+        >
+          <a-input v-model:value="formState.product.ProductDescription" />
         </a-form-item>
       </a-form>
       <a-card actions :style="{ backgroundColor: '#fafafa' }">
@@ -91,23 +98,13 @@ export default {
         span: 16,
       },
     };
-    const validateMessages = {
-      required: "${label} is required!",
-      types: {
-        email: "${label} is not a valid email!",
-        number: "${label} is not a valid number!",
-      },
-      number: {
-        range: "${label} must be between ${min} and ${max}",
-      },
-    };
+
     const formState = reactive({
-      user: {
-        name: "",
-        age: undefined,
-        email: "",
-        website: "",
-        introduction: "",
+      product: {
+        ProductId: undefined,
+        ProductName: "",
+        PartNumber: "",
+        ProductDescription: "",
       },
     });
 
@@ -123,7 +120,6 @@ export default {
       formState,
       onFinish,
       layout,
-      validateMessages,
       print,
       isAuthenticated: computed(() => Object.keys(store.state.user).length > 0),
     };
