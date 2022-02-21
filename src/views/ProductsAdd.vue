@@ -15,6 +15,7 @@
         v-bind="layout"
         name="nest-messages"
         @finish="onFinish"
+        id="Product"
       >
         <a-form-item
           :name="['product', 'ProductId']"
@@ -58,7 +59,7 @@
             :style="{ float: 'right' }"
             type="primary"
             html-type="submit"
-            @click="print"
+            @click="save"
             >Save</a-button
           >
         </template>
@@ -82,13 +83,18 @@ form.ant-form.ant-form-horizontal {
 <script>
 import { inject, reactive, computed } from "vue";
 import { useStore } from "vuex";
+import { ethers } from "ethers";
+import Nprogress from "nprogress";
+import 'nprogress/nprogress.css'
+
 
 export default {
   name: "ProductsAdd",
   setup() {
     const store = useStore();
     const contractInvBlock = inject("contractInvBlock");
-    const contract = contractInvBlock.ProductFactory;
+    const contractAddress = contractInvBlock.ProductFactory.contractAddress;
+    const contractABI = contractInvBlock.ProductFactory.contractABI;
 
     const layout = {
       labelCol: {
@@ -112,15 +118,45 @@ export default {
       console.log("Success:", values);
     };
 
-    const print = () => {
-      console.log(formState, contract);
+    const save = async () => {
+
+      try {
+        const { ethereum } = window;
+
+        if (ethereum) {
+          const provider = new ethers.providers.Web3Provider(ethereum);
+          const signer = provider.getSigner();
+          const ProductFactoryContract = new ethers.Contract(
+            contractAddress,
+            contractABI,
+            signer
+          );
+
+          const productTxn = await ProductFactoryContract.createProduct(
+        formState.product.ProductId,
+        formState.product.ProductName,
+        formState.product.PartNumber,
+        formState.product.ProductDescription
+          );
+          console.log("Mining...", productTxn.hash);
+          Nprogress.start();
+          await productTxn.wait();
+          Nprogress.done();
+          console.log("Mined -- ", productTxn.hash);
+          document.getElementById("Product").reset();
+        } else {
+          console.log("Ethereum object doesn't exist!");
+        }
+      } catch (error) {
+        console.log(error);
+      }
     };
 
     return {
       formState,
       onFinish,
       layout,
-      print,
+      save,
       isAuthenticated: computed(() => Object.keys(store.state.user).length > 0),
     };
   },
