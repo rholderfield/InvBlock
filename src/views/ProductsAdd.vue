@@ -85,8 +85,7 @@ import { inject, reactive, computed } from "vue";
 import { useStore } from "vuex";
 import { ethers } from "ethers";
 import Nprogress from "nprogress";
-import 'nprogress/nprogress.css'
-
+import "nprogress/nprogress.css";
 
 export default {
   name: "ProductsAdd",
@@ -119,7 +118,6 @@ export default {
     };
 
     const save = async () => {
-
       try {
         const { ethereum } = window;
 
@@ -133,10 +131,10 @@ export default {
           );
 
           const productTxn = await ProductFactoryContract.createProduct(
-        formState.product.ProductId,
-        formState.product.ProductName,
-        formState.product.PartNumber,
-        formState.product.ProductDescription
+            formState.product.ProductId,
+            formState.product.ProductName,
+            formState.product.PartNumber,
+            formState.product.ProductDescription
           );
           console.log("Mining...", productTxn.hash);
           Nprogress.start();

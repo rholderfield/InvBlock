@@ -16,33 +16,34 @@
         name="nest-messages"
         :validate-messages="validateMessages"
         @finish="onFinish"
+        id="Supplier"
       >
         <a-form-item
-          :name="['user', 'name']"
-          label="Name"
-          :rules="[{ required: true }]"
+          :name="['supplier', 'SupplierId']"
+          label="Supplier Id"
+          :rules="[
+            { required: true, type: 'number', min: 0, max: 100000000000 },
+          ]"
         >
-          <a-input v-model:value="formState.user.name" />
+          <a-input-number v-model:value="formState.supplier.SupplierId" />
         </a-form-item>
         <a-form-item
-          :name="['user', 'email']"
-          label="Email"
-          :rules="[{ type: 'email' }]"
+          :name="['supplier', 'SupplierName']"
+          label="Supplier Name"
+          :rules="[
+            { type: 'string', min: 0, max: 800, message: 'Exceeds length' },
+          ]"
         >
-          <a-input v-model:value="formState.user.email" />
+          <a-input v-model:value="formState.supplier.SupplierName" />
         </a-form-item>
         <a-form-item
-          :name="['user', 'age']"
-          label="Age"
-          :rules="[{ type: 'number', min: 0, max: 99 }]"
+          :name="['supplier', 'SupplierPhone']"
+          label="Supplier Phone"
+          :rules="[
+            { type: 'string', min: 0, max: 20, message: 'Exceeds length' },
+          ]"
         >
-          <a-input-number v-model:value="formState.user.age" />
-        </a-form-item>
-        <a-form-item :name="['user', 'website']" label="Website">
-          <a-input v-model:value="formState.user.website" />
-        </a-form-item>
-        <a-form-item :name="['user', 'introduction']" label="Introduction">
-          <a-textarea v-model:value="formState.user.introduction" />
+          <a-input v-model:value="formState.supplier.SupplierPhone" />
         </a-form-item>
       </a-form>
       <a-card actions :style="{ backgroundColor: '#fafafa' }">
@@ -51,7 +52,7 @@
             :style="{ float: 'right' }"
             type="primary"
             html-type="submit"
-            @click="print"
+            @click="save"
             >Save</a-button
           >
         </template>
@@ -75,13 +76,17 @@ form.ant-form.ant-form-horizontal {
 <script>
 import { inject, reactive, computed } from "vue";
 import { useStore } from "vuex";
+import { ethers } from "ethers";
+import Nprogress from "nprogress";
+import "nprogress/nprogress.css";
 
 export default {
-  name: "ProductsAdd",
+  name: "SuppliersAdd",
   setup() {
     const store = useStore();
     const contractInvBlock = inject("contractInvBlock");
-    const contract = contractInvBlock.SupplierFactory;
+    const contractAddress = contractInvBlock.SupplierFactory.contractAddress;
+    const contractABI = contractInvBlock.SupplierFactory.contractABI;
 
     const layout = {
       labelCol: {
@@ -102,12 +107,10 @@ export default {
       },
     };
     const formState = reactive({
-      user: {
-        name: "",
-        age: undefined,
-        email: "",
-        website: "",
-        introduction: "",
+      supplier: {
+        SupplierId: undefined,
+        SupplierName: "",
+        SupplierPhone: "",
       },
     });
 
@@ -115,8 +118,36 @@ export default {
       console.log("Success:", values);
     };
 
-    const print = () => {
-      console.log(formState, contract);
+    const save = async () => {
+      try {
+        const { ethereum } = window;
+
+        if (ethereum) {
+          const provider = new ethers.providers.Web3Provider(ethereum);
+          const signer = provider.getSigner();
+          const SupplierFactoryContract = new ethers.Contract(
+            contractAddress,
+            contractABI,
+            signer
+          );
+
+          const productTxn = await SupplierFactoryContract.createSupplier(
+            formState.supplier.SupplierId,
+            formState.supplier.SupplierName,
+            formState.supplier.SupplierPhone
+          );
+          console.log("Mining...", productTxn.hash);
+          Nprogress.start();
+          await productTxn.wait();
+          Nprogress.done();
+          console.log("Mined -- ", productTxn.hash);
+          document.getElementById("Supplier").reset();
+        } else {
+          console.log("Ethereum object doesn't exist!");
+        }
+      } catch (error) {
+        console.log(error);
+      }
     };
 
     return {
@@ -124,7 +155,7 @@ export default {
       onFinish,
       layout,
       validateMessages,
-      print,
+      save,
       isAuthenticated: computed(() => Object.keys(store.state.user).length > 0),
     };
   },
