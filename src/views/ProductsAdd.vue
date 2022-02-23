@@ -37,7 +37,7 @@
         </a-form-item>
         <a-form-item
           :name="['product', 'PartNumber']"
-          label="Product Number"
+          label="Part Number"
           :rules="[
             { type: 'string', min: 0, max: 300, message: 'Exceeds length' },
           ]"

@@ -9,7 +9,7 @@
       sticky
       :columns="columns"
       :data-source="data"
-      :scroll="{ x: 1500 }"
+      :scroll="{ x: 800 }"
     >
       <template #bodyCell="{ column }">
         <template v-if="column.key === 'operation'"><a>action</a></template>
@@ -37,81 +37,39 @@ export default {
   setup() {
     const columns = ref([
       {
-        title: "Full Name",
-        width: 100,
-        dataIndex: "name",
-        key: "name",
+        title: "Product Id",
+        width: 20,
+        dataIndex: "ProductId",
+        key: "ProductId",
         fixed: "left",
       },
       {
-        title: "Age",
-        width: 100,
-        dataIndex: "age",
-        key: "age",
-        fixed: "left",
+        title: "Product Name",
+        width: 50,
+        dataIndex: "ProductName",
+        key: "ProductName",
       },
       {
-        title: "Column 1",
-        dataIndex: "address",
-        key: "1",
-        width: 150,
-      },
-      {
-        title: "Column 2",
-        dataIndex: "address",
-        key: "2",
-        width: 150,
-      },
-      {
-        title: "Column 3",
-        dataIndex: "address",
-        key: "3",
-        width: 150,
-      },
-      {
-        title: "Column 4",
-        dataIndex: "address",
-        key: "4",
-        width: 150,
-      },
-      {
-        title: "Column 5",
-        dataIndex: "address",
-        key: "5",
-        width: 150,
-      },
-      {
-        title: "Column 6",
-        dataIndex: "address",
-        key: "6",
-        width: 150,
-      },
-      {
-        title: "Column 7",
-        dataIndex: "address",
-        key: "7",
-        width: 150,
-      },
-      {
-        title: "Column 8",
-        dataIndex: "address",
-        key: "8",
+        title: "Part Number",
+        dataIndex: "PartNumber",
+        key: "PartNumber",
+        width: 50,
       },
       {
         title: "Action",
         key: "operation",
         fixed: "right",
-        width: 100,
+        width: 20,
       },
     ]);
     const data = [];
 
-    for (let i = 0; i < 100; i++) {
+    for (let i = 0; i < 6; i++) {
       data.push({
         key: i,
-        name: `Item ${i}`,
-        age: 32,
-        address: `London Park no. ${i}`,
+        ProductId: `${i}`,
+        ProductName: `Product ${i}`,
+        PartNumber: `Part no. ${i}`,
       });
     }
 
