@@ -5,12 +5,7 @@
       padding: '8px 8px',
     }"
   >
-    <a-table
-      sticky
-      :columns="columns"
-      :data-source="data"
-      :scroll="{ x: 800 }"
-    >
+    <a-table sticky :columns="columns" :data-source=data :scroll="{ x: 800 }">
       <template #bodyCell="{ column }">
         <template v-if="column.key === 'operation'"><a>action</a></template>
       </template>
@@ -31,10 +26,20 @@
   </div>
 </template>
 <script>
-import { ref } from "vue";
+import { inject, computed, ref, onMounted } from "vue";
+import { useStore } from "vuex";
+import { ethers } from "ethers";
+import Nprogress from "nprogress";
+import "nprogress/nprogress.css";
+
 export default {
   name: "Products",
   setup() {
+    const store = useStore();
+    const $moralis = inject("$moralis");
+    const contractInvBlock = inject("contractInvBlock");
+    const contractAddress = contractInvBlock.ProductFactory.contractAddress;
+    const contractABI = contractInvBlock.ProductFactory.contractABI;
     const columns = ref([
       {
         title: "Product Id",
@@ -73,9 +78,52 @@ export default {
       });
     }
 
+    async function getProductsByOwner() {
+
+        const user = $moralis.User.current();
+        try {
+          const { ethereum } = window;
+          
+
+          if (ethereum) {
+            const provider = new ethers.providers.Web3Provider(ethereum);
+            const signer = provider.getSigner();
+            const ProductFactoryContract = new ethers.Contract(
+              contractAddress,
+              contractABI,
+              signer
+            );
+
+            Nprogress.start();
+            const productTxn = await ProductFactoryContract.getProductByOwner(
+              user.get("ethAddress")
+            );
+            Nprogress.done();
+            console.log(productTxn, data);
+
+            Nprogress.start();
+            const productDetailTxn = await ProductFactoryContract.products(
+              productTxn[2]
+            );
+            Nprogress.done();
+            console.log(productDetailTxn);
+          } else {
+            console.log("Ethereum object doesn't exist!");
+          }
+        } catch (error) {
+          console.log(error);
+        }
+      }
+
+    onMounted(() => {
+      getProductsByOwner();
+    });
+
     return {
       data,
       columns,
+      user: computed(() => store.state.user),
+      isAuthenticated: computed(() => Object.keys(store.state.user).length > 0),
     };
   },
 };
