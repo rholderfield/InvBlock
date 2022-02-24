@@ -5,7 +5,7 @@
       padding: '8px 8px',
     }"
   >
-    <a-table sticky :columns="columns" :data-source=data :scroll="{ x: 800 }">
+    <a-table sticky :columns="columns" :data-source="data" :scroll="{ x: 800 }">
       <template #bodyCell="{ column }">
         <template v-if="column.key === 'operation'"><a>action</a></template>
       </template>
@@ -79,41 +79,39 @@ export default {
     }
 
     async function getProductsByOwner() {
+      const user = $moralis.User.current();
+      try {
+        const { ethereum } = window;
 
-        const user = $moralis.User.current();
-        try {
-          const { ethereum } = window;
-          
+        if (ethereum) {
+          const provider = new ethers.providers.Web3Provider(ethereum);
+          const signer = provider.getSigner();
+          const ProductFactoryContract = new ethers.Contract(
+            contractAddress,
+            contractABI,
+            signer
+          );
 
-          if (ethereum) {
-            const provider = new ethers.providers.Web3Provider(ethereum);
-            const signer = provider.getSigner();
-            const ProductFactoryContract = new ethers.Contract(
-              contractAddress,
-              contractABI,
-              signer
-            );
+          Nprogress.start();
+          const productTxn = await ProductFactoryContract.getProductByOwner(
+            user.get("ethAddress")
+          );
 
-            Nprogress.start();
-            const productTxn = await ProductFactoryContract.getProductByOwner(
-              user.get("ethAddress")
-            );
-            Nprogress.done();
-            console.log(productTxn, data);
-
-            Nprogress.start();
+          for (let value of productTxn) {
             const productDetailTxn = await ProductFactoryContract.products(
-              productTxn[2]
+              productTxn[value]
             );
-            Nprogress.done();
             console.log(productDetailTxn);
-          } else {
-            console.log("Ethereum object doesn't exist!");
           }
-        } catch (error) {
-          console.log(error);
+
+          Nprogress.done();
+        } else {
+          console.log("Ethereum object doesn't exist!");
         }
+      } catch (error) {
+        console.log(error);
       }
+    }
 
     onMounted(() => {
       getProductsByOwner();
