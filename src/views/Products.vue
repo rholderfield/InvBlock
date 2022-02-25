@@ -29,8 +29,6 @@
 import { inject, computed, ref } from "vue";
 import { useStore } from "vuex";
 import { ethers } from "ethers";
-import Nprogress from "nprogress";
-import "nprogress/nprogress.css";
 
 const columns = ref([
   {
@@ -61,6 +59,7 @@ const columns = ref([
 ]);
 
 export default {
+  name: "Products",
   data() {
     const store = useStore();
 
@@ -77,19 +76,6 @@ export default {
     this.getProductsByOwner();
   },
   methods: {
-    handleTableChange(pagination, filters, sorter) {
-      console.log(pagination);
-      const pager = { ...this.pagination };
-      pager.current = pagination.current;
-      this.pagination = pager;
-      this.fetch({
-        results: pagination.pageSize,
-        page: pagination.current,
-        sortField: sorter.field,
-        sortOrder: sorter.order,
-        ...filters,
-      });
-    },
     async getProductsByOwner() {
       try {
         const { ethereum } = window;
@@ -107,7 +93,6 @@ export default {
             signer
           );
           this.loading = true;
-          Nprogress.start();
           const productTxn = await ProductFactoryContract.getProductByOwner(
             this.user.get("ethAddress")
           );
@@ -128,7 +113,6 @@ export default {
           }
           this.data = [...productsCleaned]
           this.loading = false;
-          Nprogress.done();
         } else {
           console.log("Ethereum object doesn't exist!");
         }
