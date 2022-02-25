@@ -5,7 +5,7 @@
       padding: '8px 8px',
     }"
   >
-    <a-table sticky :columns="columns" :data-source="data" :scroll="{ x: 800 }">
+    <a-table sticky :columns="columns" :data-source="data" :loading="loading" :scroll="{ x: 800 }">
       <template #bodyCell="{ column }">
         <template v-if="column.key === 'operation'"><a>action</a></template>
       </template>
@@ -26,10 +26,10 @@
   </div>
 </template>
 <script>
-import { ref } from "vue";
-export default {
-  name: "Suppliers",
-  setup() {
+import { inject, computed, ref } from "vue";
+import { useStore } from "vuex";
+import { ethers } from "ethers";
+
     const columns = ref([
       {
         title: "Supplier Id",
@@ -57,21 +57,70 @@ export default {
         width: 20,
       },
     ]);
-    const data = [];
 
-    for (let i = 0; i <= 5; i++) {
-      data.push({
-        key: i,
-        SupplierId: `${i}`,
-        SupplierName: `Supplier ${i}`,
-        SupplierPhone: `408-123-457${i}`,
-      });
-    }
+export default {
+  name: "Suppliers",
+  data() {
+    const store = useStore();
 
     return {
-      data,
+      data: [],
+      loading: false,
       columns,
+      user: computed(() => store.state.user),
+      isAuthenticated: computed(() => Object.keys(store.state.user).length > 0),
+      counter: 0
     };
   },
+  mounted() {
+    this.getSuppliersByOwner();
+  },
+  methods: {
+    async getSuppliersByOwner() {
+      try {
+        const { ethereum } = window;
+
+        if (ethereum) {
+          const contractInvBlock = inject("contractInvBlock");
+          const contractAddress =
+            contractInvBlock.SupplierFactory.contractAddress;
+          const contractABI = contractInvBlock.SupplierFactory.contractABI;
+          const provider = new ethers.providers.Web3Provider(ethereum);
+          const signer = provider.getSigner();
+          const SupplierFactoryContract = new ethers.Contract(
+            contractAddress,
+            contractABI,
+            signer
+          );
+          this.loading = true;
+          const supplierTxn = await SupplierFactoryContract.getSupplierByOwner(
+            this.user.get("ethAddress")
+          );
+
+          let suppliersCleaned = [];
+
+          for (let value of supplierTxn) {
+            const suppliertDetailTxn = await SupplierFactoryContract.suppliers(
+              supplierTxn[value]
+            );
+            suppliersCleaned.push({
+              key: this.counter,
+              SupplierId: Number(suppliertDetailTxn.SupplierId),
+              SupplierName: suppliertDetailTxn.SupplierName,
+              SupplierPhone: suppliertDetailTxn.SupplierPhone,
+            });
+            this.counter++;
+          }
+          this.data = [...suppliersCleaned]
+          this.loading = false;
+        } else {
+          console.log("Ethereum object doesn't exist!");
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    },
+  },
 };
+
 </script>
