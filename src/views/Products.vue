@@ -5,7 +5,7 @@
       padding: '8px 8px',
     }"
   >
-    <a-table sticky :columns="columns" :data-source="data" :scroll="{ x: 800 }">
+    <a-table sticky :columns="columns" :data-source="data" :loading="loading" :scroll="{ x: 800 }">
       <template #bodyCell="{ column }">
         <template v-if="column.key === 'operation'"><a>action</a></template>
       </template>
@@ -26,64 +26,79 @@
   </div>
 </template>
 <script>
-import { inject, computed, ref, onMounted } from "vue";
+import { inject, computed, ref } from "vue";
 import { useStore } from "vuex";
 import { ethers } from "ethers";
 import Nprogress from "nprogress";
 import "nprogress/nprogress.css";
 
+const columns = ref([
+  {
+    title: "Product Id",
+    width: 20,
+    dataIndex: "ProductId",
+    key: "ProductId",
+    fixed: "left",
+  },
+  {
+    title: "Product Name",
+    width: 50,
+    dataIndex: "ProductName",
+    key: "ProductName",
+  },
+  {
+    title: "Part Number",
+    dataIndex: "PartNumber",
+    key: "PartNumber",
+    width: 50,
+  },
+  {
+    title: "Action",
+    key: "operation",
+    fixed: "right",
+    width: 20,
+  },
+]);
+
 export default {
-  name: "Products",
-  setup() {
+  data() {
     const store = useStore();
-    const $moralis = inject("$moralis");
-    const contractInvBlock = inject("contractInvBlock");
-    const contractAddress = contractInvBlock.ProductFactory.contractAddress;
-    const contractABI = contractInvBlock.ProductFactory.contractABI;
-    const columns = ref([
-      {
-        title: "Product Id",
-        width: 20,
-        dataIndex: "ProductId",
-        key: "ProductId",
-        fixed: "left",
-      },
-      {
-        title: "Product Name",
-        width: 50,
-        dataIndex: "ProductName",
-        key: "ProductName",
-      },
-      {
-        title: "Part Number",
-        dataIndex: "PartNumber",
-        key: "PartNumber",
-        width: 50,
-      },
-      {
-        title: "Action",
-        key: "operation",
-        fixed: "right",
-        width: 20,
-      },
-    ]);
-    const data = [];
 
-    for (let i = 0; i < 6; i++) {
-      data.push({
-        key: i,
-        ProductId: `${i}`,
-        ProductName: `Product ${i}`,
-        PartNumber: `Part no. ${i}`,
+    return {
+      data: [],
+      loading: false,
+      columns,
+      user: computed(() => store.state.user),
+      isAuthenticated: computed(() => Object.keys(store.state.user).length > 0),
+      counter: 0
+    };
+  },
+  mounted() {
+    this.getProductsByOwner();
+  },
+  methods: {
+    handleTableChange(pagination, filters, sorter) {
+      console.log(pagination);
+      const pager = { ...this.pagination };
+      pager.current = pagination.current;
+      this.pagination = pager;
+      this.fetch({
+        results: pagination.pageSize,
+        page: pagination.current,
+        sortField: sorter.field,
+        sortOrder: sorter.order,
+        ...filters,
       });
-    }
-
-    async function getProductsByOwner() {
-      const user = $moralis.User.current();
+    },
+    async getProductsByOwner() {
       try {
         const { ethereum } = window;
 
         if (ethereum) {
+          const contractInvBlock = inject("contractInvBlock");
+          const contractAddress =
+            contractInvBlock.ProductFactory.contractAddress;
+          const contractABI = contractInvBlock.ProductFactory.contractABI;
           const provider = new ethers.providers.Web3Provider(ethereum);
           const signer = provider.getSigner();
           const ProductFactoryContract = new ethers.Contract(
@@ -91,19 +106,28 @@ export default {
             contractABI,
             signer
           );
-
+          this.loading = true;
           Nprogress.start();
           const productTxn = await ProductFactoryContract.getProductByOwner(
-            user.get("ethAddress")
+            this.user.get("ethAddress")
           );
+
+          let productsCleaned = [];
 
           for (let value of productTxn) {
             const productDetailTxn = await ProductFactoryContract.products(
               productTxn[value]
             );
-            console.log(productDetailTxn);
+            productsCleaned.push({
+              key: this.counter,
+              ProductId: Number(productDetailTxn.ProductId),
+              ProductName: productDetailTxn.ProductName,
+              PartNumber: productDetailTxn.PartNumber,
+            });
+            this.counter++;
           }
-
+          this.data = [...productsCleaned]
+          this.loading = false;
           Nprogress.done();
         } else {
           console.log("Ethereum object doesn't exist!");
@@ -111,18 +135,7 @@ export default {
       } catch (error) {
         console.log(error);
       }
-    }
-
-    onMounted(() => {
-      getProductsByOwner();
-    });
-
-    return {
-      data,
-      columns,
-      user: computed(() => store.state.user),
-      isAuthenticated: computed(() => Object.keys(store.state.user).length > 0),
-    };
+    },
   },
 };
 </script>
