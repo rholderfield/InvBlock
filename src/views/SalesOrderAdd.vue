@@ -23,11 +23,6 @@
             v-bind="index === 0 ? formItemLayout : {}"
             :label="index === 0 ? 'Line Details' : ''"
             :name="['domains', index, 'value']"
-            :rules="{
-              required: true,
-              message: 'can not be null',
-              trigger: 'change',
-            }"
             >
             <div class="listItems">
             <div>
@@ -70,15 +65,6 @@
               Add Line
             </a-button>
           </a-form-item>
-          <a-form-item v-bind="formItemLayoutWithOutLabel">
-            <a-button type="primary" html-type="submit" @click="submitForm"
-              >Submit</a-button
-            >
-            <a-button style="margin-left: 10px" @click="resetForm"
-              >Reset</a-button
-            >
-          </a-form-item>
-          
         </a-form>
       </a-card>
       <a-card
@@ -171,19 +157,17 @@ export default defineComponent({
     });
 
     dynamicValidateForm.domains.push({
-      value: "",
       key: Date.now(),
+      ProductId: null,
+      Amount: null,
+      Quantity: null
     });
 
     const submitForm = () => {
-      formRef.value
-        .validate()
-        .then(() => {
+
           console.log("values", dynamicValidateForm.domains);
-        })
-        .catch((error) => {
-          console.log("error", error);
-        });
+
+
     };
 
     const resetForm = () => {
@@ -200,8 +184,10 @@ export default defineComponent({
 
     const addDomain = () => {
       dynamicValidateForm.domains.push({
-        value: "",
-        key: Date.now(),
+      key: Date.now(),
+      ProductId: null,
+      Amount: null,
+      Quantity: null
       });
     };
 
