@@ -9,79 +9,93 @@
       title="Sales Order Details"
       :headStyle="{ backgroundColor: '#fafafa' }"
     >
-      <a-card> Order Details </a-card>
-
-      <a-card :style="{ marginTop: '16px' }">
-        <a-form
-          ref="formRef"
-          :model="dynamicValidateForm"
-          v-bind="formItemLayoutWithOutLabel"
-        >
+      <a-form
+        ref="formRef"
+        :model="dynamicValidateForm"
+        v-bind="formItemLayoutWithOutLabel"
+      >
+        <a-card :style="{ display: 'flex' }">
+          <a-form-item :name="['DocNumber']" :label="['Document Number']">
+            <a-input-number v-model:value="dynamicValidateForm.DocNumber" />
+          </a-form-item>
           <a-form-item
-            v-for="(domain, index) in dynamicValidateForm.domains"
-            :key="domain.key"
+            :name="['TransactionDate']"
+            :label="['Transaction Date']"
+          >
+            <a-input-number
+              v-model:value="dynamicValidateForm.TransactionDate"
+            />
+          </a-form-item>
+          <a-form-item :name="['Customer']" :label="['Customer']">
+            <a-input v-model:value="dynamicValidateForm.Customer" />
+          </a-form-item>
+        </a-card>
+
+        <a-card :style="{ marginTop: '16px' }">
+          <a-form-item
+            v-for="(line, index) in dynamicValidateForm.lines"
+            :key="line.key"
             v-bind="index === 0 ? formItemLayout : {}"
             :label="index === 0 ? 'Line Details' : ''"
-            :name="['domains', index, 'value']"
-            >
-            <div class="listItems">
-            <div>
-              <a-typography-text>Line Amount </a-typography-text>
-              <a-input-number
-                v-model:value="domain.Amount"
-                placeholder="0.00"
-                style="width: 60%; margin-right: 8px"
+            :name="['lines', index, 'value']"
+          >
+            <div class="lineItems">
+              <div>
+                <a-typography-text>Line Amount </a-typography-text>
+                <a-input-number
+                  v-model:value="line.Amount"
+                  placeholder="0.00"
+                  style="width: 60%; margin-right: 8px"
+                />
+              </div>
+              <div>
+                <a-typography-text>Product Id </a-typography-text>
+                <a-input-number
+                  v-model:value="line.ProductId"
+                  placeholder="000"
+                  style="width: 60%; margin-right: 8px"
+                />
+              </div>
+              <div>
+                <a-typography-text>Quantity </a-typography-text>
+                <a-input-number
+                  v-model:value="line.Quantity"
+                  placeholder="00"
+                  style="width: 60%; margin-right: 8px"
+                />
+              </div>
+              <MinusCircleOutlined
+                v-if="dynamicValidateForm.lines.length > 1"
+                class="dynamic-delete-button"
+                :disabled="dynamicValidateForm.lines.length === 1"
+                @click="removeLine(line)"
               />
             </div>
-            <div>
-              <a-typography-text>Product Id </a-typography-text>
-              <a-input-number
-                v-model:value="domain.ProductId"
-                placeholder="000"
-                style="width: 60%; margin-right: 8px"
-              />
-            </div>
-            <div>
-              <a-typography-text>Quantity </a-typography-text>
-              <a-input-number
-                v-model:value="domain.Quantity"
-                placeholder="00"
-                style="width: 60%; margin-right: 8px"
-              />
-            </div>
-            <MinusCircleOutlined
-              v-if="dynamicValidateForm.domains.length > 1"
-              class="dynamic-delete-button"
-              :disabled="dynamicValidateForm.domains.length === 1"
-              @click="removeDomain(domain)"
-            />
-            
-            </div>
-            </a-form-item>
+          </a-form-item>
 
           <a-form-item v-bind="formItemLayoutWithOutLabel">
-            <a-button type="dashed" style="width: 10%" @click="addDomain">
+            <a-button type="dashed" style="width: 10%" @click="addLine">
               <PlusOutlined />
               Add Line
             </a-button>
           </a-form-item>
-        </a-form>
-      </a-card>
-      <a-card
-        actions
-        :style="{ marginTop: '16px', backgroundColor: '#fafafa' }"
-      >
-        <a-button
-          :style="{ float: 'right' }"
-          type="primary"
-          html-type="submit"
-          @click="print"
-          >Save</a-button
+        </a-card>
+        <a-card
+          actions
+          :style="{ marginTop: '16px', backgroundColor: '#fafafa' }"
         >
-        <a-button :style="{ float: 'right' }" @click="$router.go(-1)"
-          >Go Back</a-button
-        >
-      </a-card>
+          <a-button
+            :style="{ float: 'right' }"
+            type="primary"
+            html-type="submit"
+            @click="submitForm"
+            >Save</a-button
+          >
+          <a-button :style="{ float: 'right' }" @click="$router.go(-1)"
+            >Go Back</a-button
+          >
+        </a-card>
+      </a-form>
     </a-card>
   </div>
 </template>
@@ -92,7 +106,7 @@ button.ant-btn {
   color: #05182a;
 }
 form.ant-form.ant-form-horizontal {
- text-align: left;
+  text-align: left;
 }
 
 .dynamic-delete-button {
@@ -111,8 +125,8 @@ form.ant-form.ant-form-horizontal {
   opacity: 0.5;
 }
 
-.listItems {
-  display:inline-flex;
+.lineItems {
+  display: inline-flex;
 }
 </style>
 
@@ -153,41 +167,41 @@ export default defineComponent({
       },
     };
     const dynamicValidateForm = reactive({
-      domains: [],
-    });
-
-    dynamicValidateForm.domains.push({
-      key: Date.now(),
-      ProductId: null,
-      Amount: null,
-      Quantity: null
+      DocNumber: null,
+      TransactionDate: null,
+      Customer: "",
+      lines: [
+        {
+          key: null,
+          ProductId: null,
+          Amount: null,
+          Quantity: null,
+        },
+      ],
     });
 
     const submitForm = () => {
-
-          console.log("values", dynamicValidateForm.domains);
-
-
+      console.log("values", dynamicValidateForm);
     };
 
     const resetForm = () => {
       formRef.value.resetFields();
     };
 
-    const removeDomain = (item) => {
-      let index = dynamicValidateForm.domains.indexOf(item);
+    const removeLine = (item) => {
+      let index = dynamicValidateForm.lines.indexOf(item);
 
       if (index !== -1) {
-        dynamicValidateForm.domains.splice(index, 1);
+        dynamicValidateForm.lines.splice(index, 1);
       }
     };
 
-    const addDomain = () => {
-      dynamicValidateForm.domains.push({
-      key: Date.now(),
-      ProductId: null,
-      Amount: null,
-      Quantity: null
+    const addLine = () => {
+      dynamicValidateForm.lines.push({
+        key: Date.now(),
+        ProductId: null,
+        Amount: null,
+        Quantity: null,
       });
     };
 
@@ -198,8 +212,8 @@ export default defineComponent({
       dynamicValidateForm,
       submitForm,
       resetForm,
-      removeDomain,
-      addDomain,
+      removeLine,
+      addLine,
     };
   },
 
