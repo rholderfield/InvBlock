@@ -9,26 +9,38 @@
       title="Sales Order Details"
       :headStyle="{ backgroundColor: '#fafafa' }"
     >
-      <a-form
-        ref="formRef"
-        :model="dynamicValidateForm"
-        v-bind="formItemLayoutWithOutLabel"
-      >
-        <a-card :style="{ display: 'flex' }">
-          <a-form-item :name="['DocNumber']" :label="['Document Number']">
-            <a-input-number v-model:value="dynamicValidateForm.DocNumber" />
-          </a-form-item>
-          <a-form-item
-            :name="['TransactionDate']"
-            :label="['Transaction Date']"
-          >
-            <a-input-number
-              v-model:value="dynamicValidateForm.TransactionDate"
-            />
-          </a-form-item>
-          <a-form-item :name="['Customer']" :label="['Customer']">
-            <a-input v-model:value="dynamicValidateForm.Customer" />
-          </a-form-item>
+      <a-form ref="formRef" :model="dynamicValidateForm">
+        <a-card>
+          <div class="header">
+            <div>
+              <a-form-item
+                :name="['TransactionDate']"
+                :label="['Transaction Date']"
+                style="margin-right: 8px"
+              >
+                <a-date-picker
+                  v-model:value="dynamicValidateForm.TransactionDate"
+                  showToday
+                />
+              </a-form-item>
+            </div>
+            <div>
+              <a-form-item :name="['DocNumber']" :label="['Document Number']">
+                <a-input-number
+                  v-model:value="dynamicValidateForm.DocNumber"
+                  style="margin-right: 8px"
+                />
+              </a-form-item>
+            </div>
+            <div>
+              <a-form-item :name="['Customer']" :label="['Customer']">
+                <a-input
+                  v-model:value="dynamicValidateForm.Customer"
+                  style="margin-right: 8px"
+                />
+              </a-form-item>
+            </div>
+          </div>
         </a-card>
 
         <a-card :style="{ marginTop: '16px' }">
@@ -36,20 +48,19 @@
             v-for="(line, index) in dynamicValidateForm.lines"
             :key="line.key"
             v-bind="index === 0 ? formItemLayout : {}"
-            :label="index === 0 ? 'Line Details' : ''"
             :name="['lines', index, 'value']"
           >
             <div class="lineItems">
               <div>
-                <a-typography-text>Line Amount </a-typography-text>
+                <a-typography-text>Quantity: </a-typography-text>
                 <a-input-number
-                  v-model:value="line.Amount"
-                  placeholder="0.00"
+                  v-model:value="line.Quantity"
+                  placeholder="00"
                   style="width: 60%; margin-right: 8px"
                 />
               </div>
               <div>
-                <a-typography-text>Product Id </a-typography-text>
+                <a-typography-text>Product Id: </a-typography-text>
                 <a-input-number
                   v-model:value="line.ProductId"
                   placeholder="000"
@@ -57,10 +68,10 @@
                 />
               </div>
               <div>
-                <a-typography-text>Quantity </a-typography-text>
+                <a-typography-text>Line Amount: </a-typography-text>
                 <a-input-number
-                  v-model:value="line.Quantity"
-                  placeholder="00"
+                  v-model:value="line.Amount"
+                  placeholder="0.00"
                   style="width: 60%; margin-right: 8px"
                 />
               </div>
@@ -128,6 +139,10 @@ form.ant-form.ant-form-horizontal {
 .lineItems {
   display: inline-flex;
 }
+
+.header {
+  display: flex;
+}
 </style>
 
 <script>
@@ -162,7 +177,7 @@ export default defineComponent({
         },
         sm: {
           span: 20,
-          offset: 4,
+          offset: 0,
         },
       },
     };
