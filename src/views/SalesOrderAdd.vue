@@ -29,6 +29,7 @@
                 <a-input-number
                   v-model:value="dynamicValidateForm.DocNumber"
                   style="margin-right: 8px"
+                  :min="0"
                 />
               </a-form-item>
             </div>
@@ -73,6 +74,8 @@
                   v-model:value="line.Amount"
                   placeholder="0.00"
                   style="width: 60%; margin-right: 8px"
+                  :min="0"
+                  :step="0.01"
                 />
               </div>
               <MinusCircleOutlined
