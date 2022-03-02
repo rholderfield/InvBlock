@@ -29,7 +29,7 @@
                 <a-input-number
                   v-model:value="dynamicValidateForm.DocNumber"
                   style="margin-right: 8px"
-                  :min="0"
+                  :min="1"
                 />
               </a-form-item>
             </div>
@@ -58,6 +58,7 @@
                   v-model:value="line.Quantity"
                   placeholder="00"
                   style="width: 60%; margin-right: 8px"
+                  :min="0"
                 />
               </div>
               <div>
@@ -88,7 +89,7 @@
           </a-form-item>
 
           <a-form-item v-bind="formItemLayoutWithOutLabel">
-            <a-button type="dashed" style="width: 10%" @click="addLine">
+            <a-button type="dashed" style="width: 16%" @click="addLine">
               <PlusOutlined />
               Add Line
             </a-button>
@@ -190,7 +191,7 @@ export default defineComponent({
       Customer: "",
       lines: [
         {
-          key: null,
+          key: Date.now(),
           ProductId: null,
           Amount: null,
           Quantity: null,
@@ -199,7 +200,8 @@ export default defineComponent({
     });
 
     const submitForm = () => {
-      console.log("values", dynamicValidateForm);
+      console.log("values", dynamicValidateForm.TransactionDate.unix());
+
     };
 
     const resetForm = () => {
