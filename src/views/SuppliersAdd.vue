@@ -25,7 +25,10 @@
             { required: true, type: 'number', min: 0, max: 100000000000 },
           ]"
         >
-          <a-input-number v-model:value="formState.supplier.SupplierId" />
+          <a-input-number
+            :min="0"
+            v-model:value="formState.supplier.SupplierId"
+          />
         </a-form-item>
         <a-form-item
           :name="['supplier', 'SupplierName']"
