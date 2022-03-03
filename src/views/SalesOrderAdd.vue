@@ -199,9 +199,28 @@ export default defineComponent({
       ],
     });
 
+    const cleanedForm = reactive({
+      DocNumber: null,
+      TransactionDate: null,
+      Customer: "",
+      lines: [
+        {
+          key: Date.now(),
+          ProductId: null,
+          Amount: null,
+          Quantity: null,
+        },
+      ],
+    });
+
     const submitForm = () => {
       console.log("values", dynamicValidateForm.TransactionDate.unix());
 
+      let lineTotal = 0;
+      for (const item of dynamicValidateForm.lines) {
+        lineTotal = lineTotal + item.Amount;
+        console.log(lineTotal);
+      }
     };
 
     const resetForm = () => {
@@ -230,6 +249,7 @@ export default defineComponent({
       formItemLayout,
       formItemLayoutWithOutLabel,
       dynamicValidateForm,
+      cleanedForm,
       submitForm,
       resetForm,
       removeLine,
