@@ -11,6 +11,9 @@ const store = createStore({
     setUser (state, payload) {
       state.user = payload
     },
+    get(state){
+      return state.user;
+    },
     setHasMetaMask(state) {
       state.hasMetaMask = true
     }

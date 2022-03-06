@@ -63,11 +63,20 @@
               </div>
               <div>
                 <a-typography-text>Product Id: </a-typography-text>
-                <a-input-number
+                <a-select
+                  show-search
+                  placeholder="Select a product"
+                  option-filter-prop="data"
+                  :filter-option="filterOption"
+                  style="width: 12.5em; margin-right: 8px"
                   v-model:value="line.ProductId"
-                  placeholder="000"
-                  style="width: 60%; margin-right: 8px"
-                />
+                  :loading="loading"
+                  @dropdownVisibleChange="handleClick"
+                >
+                  <a-select-option v-for="d in data" :key="d.ProductId">
+                    {{ d.ProductId }} - {{ d.ProductName }}
+                  </a-select-option>
+                </a-select>
               </div>
               <div>
                 <a-typography-text>Line Amount: </a-typography-text>
@@ -99,12 +108,14 @@
           actions
           :style="{ marginTop: '16px', backgroundColor: '#fafafa' }"
         >
-          <a-button
-            :style="{ float: 'right' }"
-            type="primary"
-            html-type="submit"
-            @click="submitForm"
-            >Save</a-button
+          <template v-if="isAuthenticated">
+            <a-button
+              :style="{ float: 'right' }"
+              type="primary"
+              html-type="submit"
+              @click="submitForm"
+              >Save</a-button
+            ></template
           >
           <a-button :style="{ float: 'right' }" @click="$router.go(-1)"
             >Go Back</a-button
@@ -151,69 +162,141 @@ form.ant-form.ant-form-horizontal {
 
 <script>
 import { MinusCircleOutlined, PlusOutlined } from "@ant-design/icons-vue";
-import { defineComponent, reactive, ref } from "vue";
-export default defineComponent({
-  setup() {
-    const formRef = ref();
-    const formItemLayout = {
-      labelCol: {
-        xs: {
-          span: 24,
-        },
-        sm: {
-          span: 4,
-        },
-      },
-      wrapperCol: {
-        xs: {
-          span: 24,
-        },
-        sm: {
-          span: 20,
-        },
-      },
-    };
-    const formItemLayoutWithOutLabel = {
-      wrapperCol: {
-        xs: {
-          span: 24,
-          offset: 0,
-        },
-        sm: {
-          span: 20,
-          offset: 0,
-        },
-      },
-    };
-    const dynamicValidateForm = reactive({
-      DocNumber: null,
-      TransactionDate: null,
-      Customer: "",
-      lines: [
-        {
-          key: Date.now(),
-          ProductId: null,
-          Amount: null,
-          Quantity: null,
-        },
-      ],
-    });
+import { reactive, ref, inject, computed } from "vue";
+import { useStore } from "vuex";
+import { ethers } from "ethers";
 
-    const cleanedForm = reactive({
-      DocNumber: null,
-      TransactionDate: null,
-      Customer: "",
-      lines: [
-        {
-          key: Date.now(),
-          ProductId: null,
-          Amount: null,
-          Quantity: null,
-        },
-      ],
-    });
+const formRef = ref();
+const formItemLayout = {
+  labelCol: {
+    xs: {
+      span: 24,
+    },
+    sm: {
+      span: 4,
+    },
+  },
+  wrapperCol: {
+    xs: {
+      span: 24,
+    },
+    sm: {
+      span: 20,
+    },
+  },
+};
+const formItemLayoutWithOutLabel = {
+  wrapperCol: {
+    xs: {
+      span: 24,
+      offset: 0,
+    },
+    sm: {
+      span: 20,
+      offset: 0,
+    },
+  },
+};
+const dynamicValidateForm = reactive({
+  DocNumber: null,
+  TransactionDate: null,
+  Customer: "",
+  lines: [
+    {
+      key: Date.now(),
+      ProductId: null,
+      Amount: null,
+      Quantity: null,
+    },
+  ],
+});
 
-    const submitForm = () => {
+const cleanedForm = reactive({
+  DocNumber: null,
+  TransactionDate: null,
+  Customer: "",
+  lines: [
+    {
+      key: Date.now(),
+      ProductId: null,
+      Amount: null,
+      Quantity: null,
+    },
+  ],
+});
+
+export default {
+  name: "Products",
+  data() {
+    const store = useStore();
+    const contractInvBlock = inject("contractInvBlock");
+
+    return {
+      data: [],
+      loading: false,
+      user: computed(() => store.state.user),
+      isAuthenticated: computed(() => Object.keys(store.state.user).length > 0),
+      contractInvBlock,
+      formItemLayout,
+      formItemLayoutWithOutLabel,
+      cleanedForm,
+      dynamicValidateForm,
+    };
+  },
+  components: {
+    MinusCircleOutlined,
+    PlusOutlined,
+  },
+  methods: {
+    filterOption(input, option) {
+      return (
+        option.children[0].children
+          .toLowerCase()
+          .indexOf(input.toLowerCase()) >= 0
+      );
+    },
+    async handleClick() {
+      try {
+        const { ethereum } = window;
+
+        if (ethereum) {
+          const contractAddress =
+            this.contractInvBlock.ProductFactory.contractAddress;
+          const contractABI = this.contractInvBlock.ProductFactory.contractABI;
+          const provider = new ethers.providers.Web3Provider(ethereum);
+          const signer = provider.getSigner();
+          const ProductFactoryContract = new ethers.Contract(
+            contractAddress,
+            contractABI,
+            signer
+          );
+          this.loading = true;
+          const productTxn = await ProductFactoryContract.getProductByOwner(
+            this.user.get("ethAddress")
+          );
+
+          let productsCleaned = [];
+
+          for (let value of productTxn) {
+            const productDetailTxn = await ProductFactoryContract.products(
+              productTxn[value]
+            );
+            productsCleaned.push({
+              ProductId: Number(productDetailTxn.ProductId),
+              ProductName: productDetailTxn.ProductName,
+              PartNumber: productDetailTxn.PartNumber,
+            });
+          }
+          this.data = [...productsCleaned];
+          this.loading = false;
+        } else {
+          console.log("Ethereum object doesn't exist!");
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    submitForm() {
       console.log("values", dynamicValidateForm.TransactionDate.unix());
 
       let lineTotal = 0;
@@ -221,45 +304,25 @@ export default defineComponent({
         lineTotal = lineTotal + item.Amount;
         console.log(lineTotal);
       }
-    };
-
-    const resetForm = () => {
+    },
+    resetForm() {
       formRef.value.resetFields();
-    };
-
-    const removeLine = (item) => {
+    },
+    removeLine(item) {
       let index = dynamicValidateForm.lines.indexOf(item);
 
       if (index !== -1) {
         dynamicValidateForm.lines.splice(index, 1);
       }
-    };
-
-    const addLine = () => {
+    },
+    addLine() {
       dynamicValidateForm.lines.push({
         key: Date.now(),
         ProductId: null,
         Amount: null,
         Quantity: null,
       });
-    };
-
-    return {
-      formRef,
-      formItemLayout,
-      formItemLayoutWithOutLabel,
-      dynamicValidateForm,
-      cleanedForm,
-      submitForm,
-      resetForm,
-      removeLine,
-      addLine,
-    };
+    },
   },
-
-  components: {
-    MinusCircleOutlined,
-    PlusOutlined,
-  },
-});
+};
 </script>
