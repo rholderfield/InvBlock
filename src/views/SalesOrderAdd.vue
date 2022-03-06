@@ -57,7 +57,7 @@
                 <a-input-number
                   v-model:value="line.Quantity"
                   placeholder="00"
-                  style="width: 60%; margin-right: 8px"
+                  style="width: 12em; margin-right: 8px"
                   :min="0"
                 />
               </div>
@@ -68,7 +68,7 @@
                   placeholder="Select a product"
                   option-filter-prop="data"
                   :filter-option="filterOption"
-                  style="width: 12.5em; margin-right: 8px"
+                  style="width: 12em; margin-right: 8px"
                   v-model:value="line.ProductId"
                   :loading="loading"
                   @dropdownVisibleChange="handleClick"
@@ -83,7 +83,7 @@
                 <a-input-number
                   v-model:value="line.Amount"
                   placeholder="0.00"
-                  style="width: 60%; margin-right: 8px"
+                  style="width: 12em; margin-right: 8px"
                   :min="0"
                   :step="0.01"
                 />
@@ -98,7 +98,7 @@
           </a-form-item>
 
           <a-form-item v-bind="formItemLayoutWithOutLabel">
-            <a-button type="dashed" style="width: 16%" @click="addLine">
+            <a-button type="dashed" style="width: 8em" @click="addLine">
               <PlusOutlined />
               Add Line
             </a-button>
