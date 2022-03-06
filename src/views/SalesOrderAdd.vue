@@ -226,7 +226,7 @@ const cleanedForm = reactive({
 });
 
 export default {
-  name: "Products",
+  name: "SalesOrderAdd",
   data() {
     const store = useStore();
     const contractInvBlock = inject("contractInvBlock");
