@@ -98,7 +98,7 @@
           </a-form-item>
 
           <a-form-item v-bind="formItemLayoutWithOutLabel">
-            <a-button type="dashed" style="width: 8em" @click="addLine">
+            <a-button type="dashed" style="width: 8 em" @click="addLine">
               <PlusOutlined />
               Add Line
             </a-button>
@@ -215,14 +215,7 @@ const cleanedForm = reactive({
   DocNumber: null,
   TransactionDate: null,
   Customer: "",
-  lines: [
-    {
-      key: Date.now(),
-      ProductId: null,
-      Amount: null,
-      Quantity: null,
-    },
-  ],
+  lines: [],
 });
 
 export default {
@@ -296,14 +289,32 @@ export default {
         console.log(error);
       }
     },
+    cleanForm() {
+      cleanedForm.DocNumber = dynamicValidateForm.DocNumber;
+
+      let unixEpoch = dynamicValidateForm.TransactionDate.unix() || null;
+      cleanedForm.TransactionDate = unixEpoch;
+      cleanedForm.Customer = dynamicValidateForm.Customer;
+
+      for (const item of dynamicValidateForm.lines) {
+        if (item.ProductId) {
+          console.log(item);
+          cleanedForm.lines.push(["test"]);
+        } else {
+          console.log("Empty line detected");
+        }
+      }
+    },
     submitForm() {
-      console.log("values", dynamicValidateForm.TransactionDate.unix());
+      this.cleanForm();
 
       let lineTotal = 0;
       for (const item of dynamicValidateForm.lines) {
         lineTotal = lineTotal + item.Amount;
         console.log(lineTotal);
       }
+
+      console.log(JSON.stringify(cleanedForm))
     },
     resetForm() {
       formRef.value.resetFields();
