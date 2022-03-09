@@ -114,6 +114,7 @@
               type="primary"
               html-type="submit"
               @click="submitForm"
+              :disabled="disabled"
               >Save</a-button
             ></template
           >
@@ -227,6 +228,7 @@ export default {
     return {
       data: [],
       loading: false,
+      disabled: false,
       user: computed(() => store.state.user),
       isAuthenticated: computed(() => Object.keys(store.state.user).length > 0),
       contractInvBlock,
@@ -292,14 +294,30 @@ export default {
     cleanForm() {
       cleanedForm.DocNumber = dynamicValidateForm.DocNumber;
 
-      let unixEpoch = dynamicValidateForm.TransactionDate.unix() || null;
+      let unixEpoch = dynamicValidateForm.TransactionDate.unix();
       cleanedForm.TransactionDate = unixEpoch;
       cleanedForm.Customer = dynamicValidateForm.Customer;
 
+      let lineNo = 0;
+
       for (const item of dynamicValidateForm.lines) {
         if (item.ProductId) {
+          let docNumber = dynamicValidateForm.DocNumber;
+          let productId = item.ProductId;
+          let quantity = item.Quantity;
+
+          let amount = item.Amount * 100;
+          amount = amount.toFixed(0);
+
           console.log(item);
-          cleanedForm.lines.push(["test"]);
+          cleanedForm.lines.push([
+            docNumber,
+            lineNo,
+            productId,
+            quantity,
+            amount,
+          ]);
+          lineNo++;
         } else {
           console.log("Empty line detected");
         }
@@ -308,13 +326,20 @@ export default {
     submitForm() {
       this.cleanForm();
 
+      // disable button to prevent more than one submit
+      this.disabled = true;
+
+      // try transaction creation
+
+      // if fail allow re-submit of save
+
       let lineTotal = 0;
       for (const item of dynamicValidateForm.lines) {
         lineTotal = lineTotal + item.Amount;
         console.log(lineTotal);
       }
 
-      console.log(JSON.stringify(cleanedForm))
+      console.log(JSON.stringify(cleanedForm));
     },
     resetForm() {
       formRef.value.resetFields();
