@@ -20,6 +20,8 @@
               >
                 <a-date-picker
                   v-model:value="dynamicValidateForm.TransactionDate"
+                  :defaultValue="dynamicValidateForm.TransactionDate"
+                  :disabled="disabled"
                   showToday
                 />
               </a-form-item>
@@ -30,6 +32,7 @@
                   v-model:value="dynamicValidateForm.DocNumber"
                   style="margin-right: 8px"
                   :min="1"
+                  :disabled="disabled"
                 />
               </a-form-item>
             </div>
@@ -38,6 +41,7 @@
                 <a-input
                   v-model:value="dynamicValidateForm.Customer"
                   style="margin-right: 8px"
+                  :disabled="disabled"
                 />
               </a-form-item>
             </div>
@@ -59,6 +63,7 @@
                   placeholder="00"
                   style="width: 12em; margin-right: 8px"
                   :min="0"
+                  :disabled="disabled"
                 />
               </div>
               <div>
@@ -70,6 +75,7 @@
                   :filter-option="filterOption"
                   style="width: 12em; margin-right: 8px"
                   v-model:value="line.ProductId"
+                  :disabled="disabled"
                   :loading="loading"
                   @dropdownVisibleChange="handleClick"
                 >
@@ -86,6 +92,7 @@
                   style="width: 12em; margin-right: 8px"
                   :min="0"
                   :step="0.01"
+                  :disabled="disabled"
                 />
               </div>
               <MinusCircleOutlined
@@ -166,6 +173,9 @@ import { MinusCircleOutlined, PlusOutlined } from "@ant-design/icons-vue";
 import { reactive, ref, inject, computed } from "vue";
 import { useStore } from "vuex";
 import { ethers } from "ethers";
+import moment from 'moment'
+import Nprogress from "nprogress";
+import "nprogress/nprogress.css"
 
 const formRef = ref();
 const formItemLayout = {
@@ -200,7 +210,7 @@ const formItemLayoutWithOutLabel = {
 };
 const dynamicValidateForm = reactive({
   DocNumber: null,
-  TransactionDate: null,
+  TransactionDate: moment(Date.now()),
   Customer: "",
   lines: [
     {
@@ -236,6 +246,7 @@ export default {
       formItemLayoutWithOutLabel,
       cleanedForm,
       dynamicValidateForm,
+      moment
     };
   },
   components: {
@@ -323,7 +334,7 @@ export default {
         }
       }
     },
-    submitForm() {
+    async submitForm() {
       this.cleanForm();
 
       // disable button to prevent more than one submit
@@ -331,7 +342,41 @@ export default {
 
       // try transaction creation
 
-      // if fail allow re-submit of save
+            try {
+        const { ethereum } = window;
+        const SalesOrderHeaderFactoryContractAddress = this.contractInvBlock.SalesOrderHeaderFactory.contractAddress;
+        const SalesOrderHeaderFactoryContractABI = this.contractInvBlock.SalesOrderHeaderFactory.contractABI;
+
+
+        if (ethereum) {
+          const provider = new ethers.providers.Web3Provider(ethereum);
+          const signer = provider.getSigner();
+          const SalesOrderHeaderFactoryContractContract = new ethers.Contract(
+            SalesOrderHeaderFactoryContractAddress,
+            SalesOrderHeaderFactoryContractABI,
+            signer
+          );
+
+          const SalesOrderTxn = await SalesOrderHeaderFactoryContractContract.createSalesOrderHeader(
+            cleanedForm.DocNumber,
+            cleanedForm.TransactionDate,
+            cleanedForm.Customer,
+            cleanedForm.lines
+          );
+          console.log("Mining...", SalesOrderTxn.hash);
+          Nprogress.start();
+          await SalesOrderTxn.wait();
+          Nprogress.done();
+          console.log("Mined -- ", SalesOrderTxn.hash);
+
+        } else {
+          console.log("Ethereum object doesn't exist!");
+          this.disabled = true;
+        }
+      } catch (error) {
+        console.log(error);
+        this.disabled = true;
+      }
 
       let lineTotal = 0;
       for (const item of dynamicValidateForm.lines) {
