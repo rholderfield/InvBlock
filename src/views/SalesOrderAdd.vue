@@ -351,13 +351,13 @@ export default {
         if (ethereum) {
           const provider = new ethers.providers.Web3Provider(ethereum);
           const signer = provider.getSigner();
-          const SalesOrderHeaderFactoryContractContract = new ethers.Contract(
+          const SalesOrderHeaderFactoryContract = new ethers.Contract(
             SalesOrderHeaderFactoryContractAddress,
             SalesOrderHeaderFactoryContractABI,
             signer
           );
 
-          const SalesOrderTxn = await SalesOrderHeaderFactoryContractContract.createSalesOrderHeader(
+          const SalesOrderTxn = await SalesOrderHeaderFactoryContract.createSalesOrderHeader(
             cleanedForm.DocNumber,
             cleanedForm.TransactionDate,
             cleanedForm.Customer,
