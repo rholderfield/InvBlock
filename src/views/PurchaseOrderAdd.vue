@@ -37,17 +37,27 @@
               </a-form-item>
             </div>
             <div>
-              <a-form-item :name="['Supplier']" :label="['Supplier']">
-                <a-input
-                  v-model:value="dynamicValidateForm.SupplierId"
-                  style="margin-right: 8px"
-                  :disabled="disabled"
-                />
-              </a-form-item>
+              <a-typography-text>Supplier: </a-typography-text>
+              <a-select
+                show-search
+                option-filter-prop="supplierData"
+                :filter-option="supplierFilterOption"
+                style="width: 12em; margin-right: 8px"
+                v-model:value="dynamicValidateForm.SupplierId"
+                :disabled="disabled"
+                :supplierLoading="supplierLoading"
+                @dropdownVisibleChange="supplierHandleClick"
+              >
+                <a-select-option
+                  v-for="supplier in supplierData"
+                  :key="supplier.SupplierId"
+                >
+                  {{ supplier.SupplierId }} - {{ supplier.SupplierName }}
+                </a-select-option>
+              </a-select>
             </div>
           </div>
         </a-card>
-
         <a-card :style="{ marginTop: '16px' }">
           <a-form-item
             v-for="(line, index) in dynamicValidateForm.lines"
@@ -173,9 +183,9 @@ import { MinusCircleOutlined, PlusOutlined } from "@ant-design/icons-vue";
 import { reactive, ref, inject, computed } from "vue";
 import { useStore } from "vuex";
 import { ethers } from "ethers";
-import moment from 'moment'
+import moment from "moment";
 import Nprogress from "nprogress";
-import "nprogress/nprogress.css"
+import "nprogress/nprogress.css";
 
 const formRef = ref();
 const formItemLayout = {
@@ -237,6 +247,8 @@ export default {
 
     return {
       data: [],
+      supplierData: [],
+      supplierLoading: false,
       loading: false,
       disabled: false,
       user: computed(() => store.state.user),
@@ -246,7 +258,7 @@ export default {
       formItemLayoutWithOutLabel,
       cleanedForm,
       dynamicValidateForm,
-      moment
+      moment,
     };
   },
   components: {
@@ -255,6 +267,13 @@ export default {
   },
   methods: {
     filterOption(input, option) {
+      return (
+        option.children[0].children
+          .toLowerCase()
+          .indexOf(input.toLowerCase()) >= 0
+      );
+    },
+    supplierFilterOption(input, option) {
       return (
         option.children[0].children
           .toLowerCase()
@@ -302,6 +321,47 @@ export default {
         console.log(error);
       }
     },
+    async supplierHandleClick() {
+      try {
+        const { ethereum } = window;
+
+        if (ethereum) {
+          const contractAddress =
+            this.contractInvBlock.SupplierFactory.contractAddress;
+          const contractABI = this.contractInvBlock.SupplierFactory.contractABI;
+          const provider = new ethers.providers.Web3Provider(ethereum);
+          const signer = provider.getSigner();
+          const SupplierFactoryContract = new ethers.Contract(
+            contractAddress,
+            contractABI,
+            signer
+          );
+          this.supplierLoading = true;
+          const supplierTxn = await SupplierFactoryContract.getSupplierByOwner(
+            this.user.get("ethAddress")
+          );
+
+          let suppliersCleaned = [];
+
+          for (let value of supplierTxn) {
+            const suppliertDetailTxn = await SupplierFactoryContract.suppliers(
+              supplierTxn[value]
+            );
+            suppliersCleaned.push({
+              SupplierId: Number(suppliertDetailTxn.SupplierId),
+              SupplierName: suppliertDetailTxn.SupplierName,
+              SupplierPhone: suppliertDetailTxn.SupplierPhone,
+            });
+          }
+          this.supplierData = [...suppliersCleaned];
+          this.supplierLoading = false;
+        } else {
+          console.log("Ethereum object doesn't exist!");
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    },
     cleanForm() {
       cleanedForm.DocNumber = dynamicValidateForm.DocNumber;
 
@@ -342,11 +402,12 @@ export default {
 
       // try transaction creation
 
-            try {
+      try {
         const { ethereum } = window;
-        const PurchaseOrderHeaderFactoryContractAddress = this.contractInvBlock.PurchaseOrderHeaderFactory.contractAddress;
-        const PurchaseOrderHeaderFactoryContractABI = this.contractInvBlock.PurchaseOrderHeaderFactory.contractABI;
-
+        const PurchaseOrderHeaderFactoryContractAddress =
+          this.contractInvBlock.PurchaseOrderHeaderFactory.contractAddress;
+        const PurchaseOrderHeaderFactoryContractABI =
+          this.contractInvBlock.PurchaseOrderHeaderFactory.contractABI;
 
         if (ethereum) {
           const provider = new ethers.providers.Web3Provider(ethereum);
@@ -357,18 +418,18 @@ export default {
             signer
           );
 
-          const PurchaseOrderTxn = await PurchaseOrderHeaderFactoryContracContract.createPurchaseOrderHeader(
-            cleanedForm.DocNumber,
-            cleanedForm.TransactionDate,
-            cleanedForm.SupplierId,
-            cleanedForm.lines
-          );
+          const PurchaseOrderTxn =
+            await PurchaseOrderHeaderFactoryContracContract.createPurchaseOrderHeader(
+              cleanedForm.DocNumber,
+              cleanedForm.TransactionDate,
+              cleanedForm.SupplierId,
+              cleanedForm.lines
+            );
           console.log("Mining...", PurchaseOrderTxn.hash);
           Nprogress.start();
           await PurchaseOrderTxn.wait();
           Nprogress.done();
           console.log("Mined -- ", PurchaseOrderTxn.hash);
-
         } else {
           console.log("Ethereum object doesn't exist!");
           this.disabled = true;
