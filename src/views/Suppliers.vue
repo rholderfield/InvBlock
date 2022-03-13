@@ -35,7 +35,7 @@ import { ethers } from "ethers";
         title: "Supplier Id",
         width: 20,
         dataIndex: "SupplierId",
-        key: "Supplier Id",
+        key: "SupplierId",
         fixed: "left",
       },
       {
