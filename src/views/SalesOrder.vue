@@ -30,99 +30,7 @@
     </a-table>
   </div>
 </template>
-<script>
-import { ref } from "vue";
-export default {
-  name: "SalesOrder",
-  setup() {
-    const columns = ref([
-      {
-        title: "Full Name",
-        width: 100,
-        dataIndex: "name",
-        key: "name",
-        fixed: "left",
-      },
-      {
-        title: "Age",
-        width: 100,
-        dataIndex: "age",
-        key: "age",
-        fixed: "left",
-      },
-      {
-        title: "Column 1",
-        dataIndex: "address",
-        key: "1",
-        width: 150,
-      },
-      {
-        title: "Column 2",
-        dataIndex: "address",
-        key: "2",
-        width: 150,
-      },
-      {
-        title: "Column 3",
-        dataIndex: "address",
-        key: "3",
-        width: 150,
-      },
-      {
-        title: "Column 4",
-        dataIndex: "address",
-        key: "4",
-        width: 150,
-      },
-      {
-        title: "Column 5",
-        dataIndex: "address",
-        key: "5",
-        width: 150,
-      },
-      {
-        title: "Column 6",
-        dataIndex: "address",
-        key: "6",
-        width: 150,
-      },
-      {
-        title: "Column 7",
-        dataIndex: "address",
-        key: "7",
-        width: 150,
-      },
-      {
-        title: "Column 8",
-        dataIndex: "address",
-        key: "8",
-      },
-      {
-        title: "Action",
-        key: "operation",
-        fixed: "right",
-        width: 100,
-      },
-    ]);
-    const data = [];
-
-    for (let i = 0; i < 100; i++) {
-      data.push({
-        key: i,
-        name: `Elon ${i}`,
-        age: 32,
-        address: `London Park no. ${i}`,
-      });
-    }
-
-    return {
-      data,
-      columns,
-    };
-  },
-};
-</script>
-<style>
+<style scoped>
 #components-table-demo-summary tfoot th,
 #components-table-demo-summary tfoot td {
   background: #fafafa;
@@ -132,3 +40,110 @@ export default {
   background: #1d1d1d;
 }
 </style>
+<script>
+import { inject, computed, ref } from "vue";
+import { useStore } from "vuex";
+import { ethers } from "ethers";
+import moment from "moment";
+
+const columns = ref([
+  {
+    title: "Document Number",
+    width: 50,
+    dataIndex: "DocNumber",
+    key: "DocNumber",
+    fixed: "left",
+  },
+  {
+    title: "Transaction Date",
+    width: 50,
+    dataIndex: "TransactionDate",
+    key: "TransactionDate",
+    fixed: "left",
+  },
+  {
+    title: "Customer",
+    dataIndex: "Customer",
+    key: "Customer",
+    width: 100,
+  },
+  {
+    title: "Action",
+    key: "operation",
+    fixed: "right",
+    width: 25,
+  },
+]);
+
+export default {
+  name: "SalesOrder",
+  data() {
+    const store = useStore();
+
+    return {
+      data: [],
+      loading: false,
+      columns,
+      user: computed(() => store.state.user),
+      isAuthenticated: computed(() => Object.keys(store.state.user).length > 0),
+      counter: 0,
+    };
+  },
+  mounted() {
+    this.getSalesOrderByOwner();
+  },
+  methods: {
+    async getSalesOrderByOwner() {
+      try {
+        const { ethereum } = window;
+        const contractInvBlock = inject("contractInvBlock");
+        const SalesOrderHeaderFactoryContractAddress =
+          contractInvBlock.SalesOrderHeaderFactory.contractAddress;
+        const SalesOrderHeaderFactoryContractABI =
+          contractInvBlock.SalesOrderHeaderFactory.contractABI;
+
+        if (ethereum) {
+          const provider = new ethers.providers.Web3Provider(ethereum);
+          const signer = provider.getSigner();
+          const SalesOrderHeaderFactoryContract = new ethers.Contract(
+            SalesOrderHeaderFactoryContractAddress,
+            SalesOrderHeaderFactoryContractABI,
+            signer
+          );
+
+          this.loading = true;
+
+          const SalesOrderTxn =
+            await SalesOrderHeaderFactoryContract.getSalesOrderHeaderByOwner(
+              this.user.get("ethAddress")
+            );
+
+          let SalesOrderTxnCleaned = [];
+
+          for (let value of SalesOrderTxn) {
+            const SalesOrderDetailTxn =
+              await SalesOrderHeaderFactoryContract.salesOrderHeaders(
+                SalesOrderTxn[value]
+              );
+            SalesOrderTxnCleaned.push({
+              key: this.counter,
+              DocNumber: Number(SalesOrderDetailTxn.DocNumber),
+              TransactionDate: moment
+                .unix(Number(SalesOrderDetailTxn.TransactionDate))
+                .format("DD MMM YYYY, h:mm:ss a"),
+              Customer: SalesOrderDetailTxn.Customer,
+            });
+            this.counter++;
+          }
+          this.data = [...SalesOrderTxnCleaned];
+          this.loading = false;
+        } else {
+          console.log("Ethereum object doesn't exist!");
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    },
+  },
+};
+</script>
