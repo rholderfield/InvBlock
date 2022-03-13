@@ -49,17 +49,16 @@ import moment from "moment";
 const columns = ref([
   {
     title: "Document Number",
-    width: 50,
+    width: '1.5em',
     dataIndex: "DocNumber",
     key: "DocNumber",
     fixed: "left",
   },
   {
     title: "Transaction Date",
-    width: 50,
+    width: '2em',
     dataIndex: "TransactionDate",
-    key: "TransactionDate",
-    fixed: "left",
+    key: "TransactionDate"
   },
   {
     title: "Customer",
@@ -70,6 +69,7 @@ const columns = ref([
   {
     title: "Action",
     key: "operation",
+    dataIndex: "operation",
     fixed: "right",
     width: 25,
   },
@@ -117,14 +117,16 @@ export default {
             await SalesOrderHeaderFactoryContract.getSalesOrderHeaderByOwner(
               this.user.get("ethAddress")
             );
-
+          
           let SalesOrderTxnCleaned = [];
 
+        
           for (let value of SalesOrderTxn) {
             const SalesOrderDetailTxn =
               await SalesOrderHeaderFactoryContract.salesOrderHeaders(
                 SalesOrderTxn[value]
               );
+              console.log(JSON.stringify(SalesOrderDetailTxn));
             SalesOrderTxnCleaned.push({
               key: this.counter,
               DocNumber: Number(SalesOrderDetailTxn.DocNumber),
@@ -132,6 +134,7 @@ export default {
                 .unix(Number(SalesOrderDetailTxn.TransactionDate))
                 .format("DD MMM YYYY, h:mm:ss a"),
               Customer: SalesOrderDetailTxn.Customer,
+              operation: "hi"
             });
             this.counter++;
           }
