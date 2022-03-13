@@ -49,16 +49,16 @@ import moment from "moment";
 const columns = ref([
   {
     title: "Document Number",
-    width: '1.5em',
+    width: "1.5em",
     dataIndex: "DocNumber",
     key: "DocNumber",
     fixed: "left",
   },
   {
     title: "Transaction Date",
-    width: '2em',
+    width: "2em",
     dataIndex: "TransactionDate",
-    key: "TransactionDate"
+    key: "TransactionDate",
   },
   {
     title: "Customer",
@@ -82,6 +82,7 @@ export default {
 
     return {
       data: [],
+      dataLine: [],
       loading: false,
       columns,
       user: computed(() => store.state.user),
@@ -90,7 +91,7 @@ export default {
     };
   },
   mounted() {
-    this.getSalesOrderByOwner();
+    this.getSalesOrderByOwner().then(this.getSalesOrderLineByOwner());
   },
   methods: {
     async getSalesOrderByOwner() {
@@ -117,16 +118,15 @@ export default {
             await SalesOrderHeaderFactoryContract.getSalesOrderHeaderByOwner(
               this.user.get("ethAddress")
             );
-          
+
           let SalesOrderTxnCleaned = [];
 
-        
           for (let value of SalesOrderTxn) {
             const SalesOrderDetailTxn =
               await SalesOrderHeaderFactoryContract.salesOrderHeaders(
                 SalesOrderTxn[value]
               );
-              console.log(JSON.stringify(SalesOrderDetailTxn));
+
             SalesOrderTxnCleaned.push({
               key: this.counter,
               DocNumber: Number(SalesOrderDetailTxn.DocNumber),
@@ -134,12 +134,60 @@ export default {
                 .unix(Number(SalesOrderDetailTxn.TransactionDate))
                 .format("DD MMM YYYY, h:mm:ss a"),
               Customer: SalesOrderDetailTxn.Customer,
-              operation: "hi"
+              operation: "hi",
             });
             this.counter++;
           }
           this.data = [...SalesOrderTxnCleaned];
           this.loading = false;
+        } else {
+          console.log("Ethereum object doesn't exist!");
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    async getSalesOrderLineByOwner() {
+      try {
+        const { ethereum } = window;
+        const contractInvBlock = inject("contractInvBlock");
+        const SalesOrderHeaderFactoryContractAddress =
+          contractInvBlock.SalesOrderHeaderFactory.contractAddress;
+        const SalesOrderHeaderFactoryContractABI =
+          contractInvBlock.SalesOrderHeaderFactory.contractABI;
+
+        if (ethereum) {
+          const provider = new ethers.providers.Web3Provider(ethereum);
+          const signer = provider.getSigner();
+          const SalesOrderHeaderFactoryContract = new ethers.Contract(
+            SalesOrderHeaderFactoryContractAddress,
+            SalesOrderHeaderFactoryContractABI,
+            signer
+          );
+
+          const salesOrderLineByOwner =
+            await SalesOrderHeaderFactoryContract.getSalesOrderLineByOwner(
+              this.user.get("ethAddress")
+            );
+          console.log(salesOrderLineByOwner);
+          let SalesOrderLineTxnCleaned = [];
+
+          for (let i of salesOrderLineByOwner) {
+            const SalesOrderLineDetailTxn =
+              await SalesOrderHeaderFactoryContract.salesOrderLines(
+                salesOrderLineByOwner[i]
+              );
+
+            SalesOrderLineTxnCleaned.push({
+              DocNumber: Number(SalesOrderLineDetailTxn.DocNumber),
+              LineNo: Number(SalesOrderLineDetailTxn.LineNo),
+              ProductId: Number(SalesOrderLineDetailTxn.ProductId),
+              Quantity: Number(SalesOrderLineDetailTxn.Quantity),
+              Amount: Number(SalesOrderLineDetailTxn.Amount),
+            });
+          }
+          this.dataLine = [...SalesOrderLineTxnCleaned];
+          console.log(JSON.stringify(this.dataLine));
         } else {
           console.log("Ethereum object doesn't exist!");
         }
