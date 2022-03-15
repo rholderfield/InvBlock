@@ -1,113 +1,199 @@
 <template>
-<div :style="{
-          background: '#fff',
-          padding: '8px 8px',
-
-        }">
-  <a-table sticky :columns="columns" :data-source="data" :scroll="{ x: 1500 }">
-    <template #bodyCell="{ column }">
-      <template v-if="column.key === 'operation'"><a>action</a></template>
-    </template>
-    <template #summary>
-      <a-table-summary>
-        <a-table-summary-row>
-          <a-table-summary-cell :index="0" :col-span="2">Fix Left</a-table-summary-cell>
-          <a-table-summary-cell :index="2" :col-span="8">Scroll Context</a-table-summary-cell>
-          <a-table-summary-cell :index="10">Fix Right</a-table-summary-cell>
-        </a-table-summary-row>
-      </a-table-summary>
-    </template>
-  </a-table>
-</div>
+  <div
+    :style="{
+      background: '#fff',
+      padding: '8px 8px',
+    }"
+  >
+    <a-table
+      sticky
+      :columns="columns"
+      :data-source="data"
+      :scroll="{ x: 1500 }"
+    >
+      <template #bodyCell="{ column }">
+        <template v-if="column.key === 'operation'"><a>action</a></template>
+      </template>
+      <template #summary>
+        <a-table-summary>
+          <a-table-summary-row>
+            <a-table-summary-cell :index="0" :col-span="2"
+              >Fix Left</a-table-summary-cell
+            >
+            <a-table-summary-cell :index="2" :col-span="8"
+              >Scroll Context</a-table-summary-cell
+            >
+            <a-table-summary-cell :index="10">Fix Right</a-table-summary-cell>
+          </a-table-summary-row>
+        </a-table-summary>
+      </template>
+    </a-table>
+  </div>
 </template>
-<script>
-import { ref } from 'vue';
-export default ({
-  name: "PurchaseOrder",
-  setup() {
-    const columns = ref([{
-      title: 'Full Name',
-      width: 100,
-      dataIndex: 'name',
-      key: 'name',
-      fixed: 'left',
-    }, {
-      title: 'Age',
-      width: 100,
-      dataIndex: 'age',
-      key: 'age',
-      fixed: 'left',
-    }, {
-      title: 'Column 1',
-      dataIndex: 'address',
-      key: '1',
-      width: 150,
-    }, {
-      title: 'Column 2',
-      dataIndex: 'address',
-      key: '2',
-      width: 150,
-    }, {
-      title: 'Column 3',
-      dataIndex: 'address',
-      key: '3',
-      width: 150,
-    }, {
-      title: 'Column 4',
-      dataIndex: 'address',
-      key: '4',
-      width: 150,
-    }, {
-      title: 'Column 5',
-      dataIndex: 'address',
-      key: '5',
-      width: 150,
-    }, {
-      title: 'Column 6',
-      dataIndex: 'address',
-      key: '6',
-      width: 150,
-    }, {
-      title: 'Column 7',
-      dataIndex: 'address',
-      key: '7',
-      width: 150,
-    }, {
-      title: 'Column 8',
-      dataIndex: 'address',
-      key: '8',
-    }, {
-      title: 'Action',
-      key: 'operation',
-      fixed: 'right',
-      width: 100,
-    }]);
-    const data = [];
-
-    for (let i = 0; i < 100; i++) {
-      data.push({
-        key: i,
-        name: `Jack ${i}`,
-        age: 32,
-        address: `London Park no. ${i}`,
-      });
-    }
-
-    return {
-      data,
-      columns,
-    };
-  },
-
-});
-</script>
-<style>
+<style scoped>
 #components-table-demo-summary tfoot th,
 #components-table-demo-summary tfoot td {
   background: #fafafa;
 }
-[data-theme='dark'] #components-table-demo-summary tfoot th,
-[data-theme='dark'] #components-table-demo-summary tfoot td {
+[data-theme="dark"] #components-table-demo-summary tfoot th,
+[data-theme="dark"] #components-table-demo-summary tfoot td {
   background: #1d1d1d;
 }
 </style>
+<script>
+import { inject, computed, ref } from "vue";
+import { useStore } from "vuex";
+import { ethers } from "ethers";
+import moment from "moment";
+
+const columns = ref([
+  {
+    title: "Document Number",
+    width: "1.5em",
+    dataIndex: "DocNumber",
+    key: "DocNumber",
+    fixed: "left",
+  },
+  {
+    title: "Transaction Date",
+    width: "2em",
+    dataIndex: "TransactionDate",
+    key: "TransactionDate",
+  },
+  {
+    title: "Supplier Id",
+    dataIndex: "SupplierId",
+    key: "SupplierId",
+    width: 100,
+  },
+  {
+    title: "Action",
+    key: "operation",
+    dataIndex: "operation",
+    fixed: "right",
+    width: 25,
+  },
+]);
+
+export default {
+  name: "PurchaseOrder",
+  data() {
+    const store = useStore();
+
+    return {
+      data: [],
+      dataLine: [],
+      loading: false,
+      columns,
+      user: computed(() => store.state.user),
+      isAuthenticated: computed(() => Object.keys(store.state.user).length > 0),
+      counter: 0,
+    };
+  },
+  mounted() {
+    this.getPurchaseOrderByOwner().then(this.getPurchaseOrderLineByOwner());
+  },
+  methods: {
+    async getPurchaseOrderByOwner() {
+      try {
+        const { ethereum } = window;
+        const contractInvBlock = inject("contractInvBlock");
+        const PurchaseOrderHeaderFactoryContractAddress =
+          contractInvBlock.PurchaseOrderHeaderFactory.contractAddress;
+        const PurchaseOrderHeaderFactoryContractABI =
+          contractInvBlock.PurchaseOrderHeaderFactory.contractABI;
+
+        if (ethereum) {
+          const provider = new ethers.providers.Web3Provider(ethereum);
+          const signer = provider.getSigner();
+          const PurchaseOrderHeaderFactoryContract = new ethers.Contract(
+            PurchaseOrderHeaderFactoryContractAddress,
+            PurchaseOrderHeaderFactoryContractABI,
+            signer
+          );
+
+          this.loading = true;
+
+          const PurchaseOrderTxn =
+            await PurchaseOrderHeaderFactoryContract.getPurchaseOrderHeaderByOwner(
+              this.user.get("ethAddress")
+            );
+
+          let PurchaseOrderTxnCleaned = [];
+
+          for (let value of PurchaseOrderTxn) {
+            const PurchaseOrderDetailTxn =
+              await PurchaseOrderHeaderFactoryContract.purchaseOrderHeaders(
+                PurchaseOrderTxn[value]
+              );
+
+            PurchaseOrderTxnCleaned.push({
+              key: this.counter,
+              DocNumber: Number(PurchaseOrderDetailTxn.DocNumber),
+              TransactionDate: moment
+                .unix(Number(PurchaseOrderDetailTxn.TransactionDate))
+                .format("DD MMM YYYY, h:mm:ss a"),
+              SupplierId: Number(PurchaseOrderDetailTxn.SupplierId),
+            });
+            this.counter++;
+          }
+          this.data = [...PurchaseOrderTxnCleaned];
+          this.loading = false;
+        } else {
+          console.log("Ethereum object doesn't exist!");
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    async getPurchaseOrderLineByOwner() {
+      try {
+        const { ethereum } = window;
+        const contractInvBlock = inject("contractInvBlock");
+        const PurchaseOrderHeaderFactoryContractAddress =
+          contractInvBlock.PurchaseOrderHeaderFactory.contractAddress;
+        const PurchaseOrderHeaderFactoryContractABI =
+          contractInvBlock.PurchaseOrderHeaderFactory.contractABI;
+
+        if (ethereum) {
+          const provider = new ethers.providers.Web3Provider(ethereum);
+          const signer = provider.getSigner();
+          const PurchaseOrderHeaderFactoryContract = new ethers.Contract(
+            PurchaseOrderHeaderFactoryContractAddress,
+            PurchaseOrderHeaderFactoryContractABI,
+            signer
+          );
+
+          const purchaseOrderLineByOwner =
+            await PurchaseOrderHeaderFactoryContract.getPurchaseOrderLineByOwner(
+              this.user.get("ethAddress")
+            );
+
+          let PurchaseOrderLineTxnCleaned = [];
+
+          for (let line of purchaseOrderLineByOwner) {
+            const SalesOrderLineDetailTxn =
+              await PurchaseOrderHeaderFactoryContract.purchaseOrderLines(
+                purchaseOrderLineByOwner[line]
+              );
+
+            PurchaseOrderLineTxnCleaned.push({
+              DocNumber: Number(SalesOrderLineDetailTxn.DocNumber),
+              LineNo: Number(SalesOrderLineDetailTxn.LineNo),
+              ProductId: Number(SalesOrderLineDetailTxn.ProductId),
+              Quantity: Number(SalesOrderLineDetailTxn.Quantity),
+              Amount: Number(SalesOrderLineDetailTxn.Amount),
+            });
+          }
+          this.dataLine = [...PurchaseOrderLineTxnCleaned];
+          console.log(JSON.stringify(this.dataLine));
+        } else {
+          console.log("Ethereum object doesn't exist!");
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    },
+  },
+};
+</script>
