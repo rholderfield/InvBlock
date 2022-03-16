@@ -143,7 +143,7 @@ export default {
   },
   setup() {
     const current = ref(["0"]);
-    const collapsed =ref([true]);
+    const collapsed =ref(true);
     return {
       current,
       collapsed
