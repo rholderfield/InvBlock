@@ -134,7 +134,6 @@ export default {
                 .unix(Number(SalesOrderDetailTxn.TransactionDate))
                 .format("DD MMM YYYY, h:mm:ss a"),
               Customer: SalesOrderDetailTxn.Customer,
-              operation: "hi",
             });
             this.counter++;
           }
